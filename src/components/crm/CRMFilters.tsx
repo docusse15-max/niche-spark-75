@@ -18,7 +18,7 @@ interface CRMFiltersProps {
 }
 
 export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
-  const set = (key: keyof Filters, val: string) => onChange({ ...filters, [key]: val });
+  const set = (key: keyof Filters, val: string) => onChange({ ...filters, [key]: val === "all" ? "" : val });
   const hasFilters = Object.values(filters).some(v => v !== "");
 
   return (
@@ -27,25 +27,33 @@ export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input placeholder="Buscar empresa..." value={filters.search} onChange={e => set("search", e.target.value)} className="pl-8 h-9 bg-secondary border-border" />
       </div>
-      <Select value={filters.nicho || undefined} onValueChange={v => set("nicho", v)}>
+      <Select value={filters.nicho || "all"} onValueChange={v => set("nicho", v)}>
         <SelectTrigger className="w-[160px] h-9 bg-secondary border-border"><SelectValue placeholder="Nicho" /></SelectTrigger>
-        <SelectContent>{NICHOS.map(n => <SelectItem key={n} value={n}>{n}</SelectItem>)}</SelectContent>
+        <SelectContent>
+          <SelectItem value="all">Todos os Nichos</SelectItem>
+          {NICHOS.map(n => <SelectItem key={n} value={n}>{n}</SelectItem>)}
+        </SelectContent>
       </Select>
-      <Select value={filters.bairro || undefined} onValueChange={v => set("bairro", v)}>
+      <Select value={filters.bairro || "all"} onValueChange={v => set("bairro", v)}>
         <SelectTrigger className="w-[160px] h-9 bg-secondary border-border"><SelectValue placeholder="Bairro" /></SelectTrigger>
-        <SelectContent>{BAIRROS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
+        <SelectContent>
+          <SelectItem value="all">Todos os Bairros</SelectItem>
+          {BAIRROS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+        </SelectContent>
       </Select>
-      <Select value={filters.temperatura || undefined} onValueChange={v => set("temperatura", v)}>
+      <Select value={filters.temperatura || "all"} onValueChange={v => set("temperatura", v)}>
         <SelectTrigger className="w-[120px] h-9 bg-secondary border-border"><SelectValue placeholder="Temp." /></SelectTrigger>
         <SelectContent>
+          <SelectItem value="all">Todas</SelectItem>
           <SelectItem value="frio">❄️ Frio</SelectItem>
           <SelectItem value="morno">🌤 Morno</SelectItem>
           <SelectItem value="quente">🔥 Quente</SelectItem>
         </SelectContent>
       </Select>
-      <Select value={filters.status || undefined} onValueChange={v => set("status", v)}>
+      <Select value={filters.status || "all"} onValueChange={v => set("status", v)}>
         <SelectTrigger className="w-[160px] h-9 bg-secondary border-border"><SelectValue placeholder="Status" /></SelectTrigger>
         <SelectContent>
+          <SelectItem value="all">Todos</SelectItem>
           <SelectItem value="novo">Novo</SelectItem>
           <SelectItem value="sem_contato">Sem contato</SelectItem>
           <SelectItem value="primeiro_contato">Primeiro contato</SelectItem>
