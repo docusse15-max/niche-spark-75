@@ -18,7 +18,12 @@ import { useNavigate } from "react-router-dom";
 
 const EMPTY_FILTERS: Filters = { search: "", nicho: "", bairro: "", cidade: "", temperatura: "", status: "" };
 
-export default function CRM() {
+interface CRMProps {
+  currentUser: string;
+  onLogout: () => void;
+}
+
+export default function CRM({ currentUser, onLogout }: CRMProps) {
   const [leads, setLeads] = useState<Lead[]>(getInitialLeads);
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
