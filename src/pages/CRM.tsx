@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { Lead, LeadStatus, getInitialLeads, saveLeads } from "@/data/leads";
+import { Lead, LeadStatus, getInitialLeads, saveLeads, addActivityLog } from "@/data/leads";
 import CRMHeader from "@/components/crm/CRMHeader";
 import CRMFilters, { Filters } from "@/components/crm/CRMFilters";
 import HeatMap from "@/components/crm/HeatMap";
@@ -10,6 +10,9 @@ import SalesArguments from "@/components/crm/SalesArguments";
 import ProductivityPanel from "@/components/crm/ProductivityPanel";
 import NewLeadDialog from "@/components/crm/NewLeadDialog";
 import { toast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { ScrollText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const EMPTY_FILTERS: Filters = { search: "", nicho: "", bairro: "", temperatura: "", status: "" };
 
@@ -19,6 +22,8 @@ export default function CRM() {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [newLeadOpen, setNewLeadOpen] = useState(false);
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const persist = useCallback((updated: Lead[]) => {
     setLeads(updated);
@@ -38,12 +43,23 @@ export default function CRM() {
 
   const handleSelectLead = (lead: Lead) => {
     setSelectedLead(lead);
+    setSelectedLeadId(lead.id);
+    setSheetOpen(true);
+  };
+
+  const handleSelectLeadOnMap = (lead: Lead) => {
+    setSelectedLeadId(lead.id);
+    setSelectedLead(lead);
     setSheetOpen(true);
   };
 
   const handleUpdateStatus = (id: string, status: LeadStatus) => {
+    const lead = leads.find(l => l.id === id);
     const updated = leads.map(l => l.id === id ? { ...l, status, ultimoContato: new Date().toISOString().split("T")[0] } : l);
     persist(updated);
+    if (lead) {
+      addActivityLog({ action: "status_alterado", leadEmpresa: lead.empresa, leadId: id, author: "Sistema", details: `Status → ${status}` });
+    }
     toast({ title: "Status atualizado" });
   };
 
@@ -57,12 +73,16 @@ export default function CRM() {
     });
     persist(updated);
     const updatedLead = updated.find(l => l.id === id);
-    if (updatedLead) setSelectedLead(updatedLead);
+    if (updatedLead) {
+      setSelectedLead(updatedLead);
+      addActivityLog({ action: "nota_adicionada", leadEmpresa: updatedLead.empresa, leadId: id, author, details: note });
+    }
     toast({ title: "Anotação registrada", description: `por ${author}` });
   };
 
   const handleNewLead = (lead: Lead) => {
     persist([lead, ...leads]);
+    addActivityLog({ action: "lead_criado", leadEmpresa: lead.empresa, leadId: lead.id, author: "Sistema", details: `${lead.segmento} · ${lead.bairro}` });
     toast({ title: "Lead adicionado!", description: lead.empresa });
   };
 
@@ -75,22 +95,33 @@ export default function CRM() {
     const a = document.createElement("a");
     a.href = url; a.download = "leads-recorrencia-cg.csv"; a.click();
     URL.revokeObjectURL(url);
+    addActivityLog({ action: "lead_exportado", leadEmpresa: "Base completa", leadId: "", author: "Sistema", details: `${leads.length} leads exportados` });
     toast({ title: "Base exportada!" });
   };
 
   const handleBairroFilter = (bairro: string) => {
     setFilters(f => ({ ...f, bairro }));
+    setSelectedLeadId(null);
   };
 
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-[1400px] mx-auto px-4 py-4 space-y-4">
-        <CRMHeader leads={leads} onNewLead={() => setNewLeadOpen(true)} onRefresh={() => { persist(getInitialLeads()); toast({ title: "Base atualizada" }); }} onExport={handleExport} />
-        <CRMFilters filters={filters} onChange={setFilters} />
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <CRMHeader leads={leads} onNewLead={() => setNewLeadOpen(true)} onRefresh={() => { persist(getInitialLeads()); toast({ title: "Base atualizada" }); }} onExport={handleExport} />
+          </div>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex-1"><CRMFilters filters={filters} onChange={setFilters} /></div>
+          <Button variant="outline" size="sm" className="ml-2 shrink-0" onClick={() => navigate("/log")}>
+            <ScrollText className="h-4 w-4 mr-1" />Log
+          </Button>
+        </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           <div className="lg:col-span-3 space-y-4">
-            <HeatMap leads={leads} selectedBairro={filters.bairro} onSelectBairro={handleBairroFilter} />
+            <HeatMap leads={leads} selectedBairro={filters.bairro} onSelectBairro={handleBairroFilter} selectedLeadId={selectedLeadId} onSelectLeadOnMap={handleSelectLeadOnMap} />
             <LeadsTable leads={filteredLeads} onSelectLead={handleSelectLead} onUpdateStatus={handleUpdateStatus} />
           </div>
           <div className="space-y-4">
