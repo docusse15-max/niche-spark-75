@@ -37,6 +37,7 @@ export default function CRM() {
       if (filters.search && !l.empresa.toLowerCase().includes(filters.search.toLowerCase())) return false;
       if (filters.nicho && l.segmento !== filters.nicho) return false;
       if (filters.bairro && l.bairro !== filters.bairro) return false;
+      if (filters.cidade && l.cidade !== filters.cidade) return false;
       if (filters.temperatura && l.temperatura !== filters.temperatura) return false;
       if (filters.status && l.status !== filters.status) return false;
       return true;
