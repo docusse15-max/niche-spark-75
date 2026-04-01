@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { Lead } from "@/data/leads";
 import { Progress } from "@/components/ui/progress";
 
@@ -7,7 +6,6 @@ interface ProductivityPanelProps {
 }
 
 export default function ProductivityPanel({ leads }: ProductivityPanelProps) {
-  // Extract unique authors from all interactions
   const authorMap = new Map<string, { contatos: number; total: number }>();
   
   leads.forEach(l => {
@@ -26,8 +24,8 @@ export default function ProductivityPanel({ leads }: ProductivityPanelProps) {
     .sort((a, b) => b.contatos - a.contatos);
 
   return (
-    <Card className="p-4">
-      <h3 className="font-semibold text-sm mb-3">📊 Atividade por Pessoa</h3>
+    <div className="p-4 bg-card border border-border rounded-lg">
+      <h3 className="font-semibold text-sm mb-3 gold-text">📊 Atividade por Pessoa</h3>
       {authors.length === 0 ? (
         <p className="text-xs text-muted-foreground">Nenhuma interação registrada ainda. Ao registrar anotações nos leads, a atividade aparecerá aqui.</p>
       ) : (
@@ -35,7 +33,7 @@ export default function ProductivityPanel({ leads }: ProductivityPanelProps) {
           {authors.map(s => (
             <div key={s.name} className="space-y-1">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">{s.name}</span>
+                <span className="text-sm font-medium text-foreground">{s.name}</span>
                 <span className="text-[10px] text-muted-foreground">{s.contatos} interações</span>
               </div>
               <Progress value={Math.min((s.contatos / Math.max(...authors.map(a => a.contatos))) * 100, 100)} className="h-1.5" />
@@ -43,6 +41,6 @@ export default function ProductivityPanel({ leads }: ProductivityPanelProps) {
           ))}
         </div>
       )}
-    </Card>
+    </div>
   );
 }

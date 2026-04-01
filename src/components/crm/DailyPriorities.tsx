@@ -1,6 +1,5 @@
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Lead, STATUS_COLORS, STATUS_LABELS } from "@/data/leads";
+import { Lead } from "@/data/leads";
 import { AlertTriangle, Flame, Clock, Zap } from "lucide-react";
 
 interface DailyPrioritiesProps {
@@ -15,29 +14,29 @@ export default function DailyPriorities({ leads, onSelectLead }: DailyPriorities
   const travados = leads.filter(l => l.status === "em_negociacao");
 
   const sections = [
-    { title: "Premium sem contato", icon: Zap, color: "text-yellow-600", items: premiumSemContato },
-    { title: "Quentes sem retorno", icon: Flame, color: "text-red-500", items: quentesSemRetorno },
-    { title: "Propostas sem follow-up", icon: Clock, color: "text-indigo-600", items: propostasSemFollowup },
-    { title: "Negociações travadas", icon: AlertTriangle, color: "text-orange-500", items: travados },
+    { title: "Premium sem contato", icon: Zap, color: "text-yellow-400", items: premiumSemContato },
+    { title: "Quentes sem retorno", icon: Flame, color: "text-red-400", items: quentesSemRetorno },
+    { title: "Propostas sem follow-up", icon: Clock, color: "text-indigo-400", items: propostasSemFollowup },
+    { title: "Negociações travadas", icon: AlertTriangle, color: "text-orange-400", items: travados },
   ];
 
   return (
-    <Card className="p-4">
-      <h3 className="font-semibold text-sm mb-3">🎯 Prioridades do Dia</h3>
+    <div className="p-4 bg-card border border-border rounded-lg">
+      <h3 className="font-semibold text-sm mb-3 gold-text">🎯 Prioridades do Dia</h3>
       <div className="space-y-3">
         {sections.map(s => (
           <div key={s.title}>
             <div className="flex items-center gap-1.5 mb-1.5">
               <s.icon className={`h-4 w-4 ${s.color}`} />
-              <span className="text-xs font-semibold">{s.title}</span>
-              <Badge variant="outline" className="text-[10px] h-4 px-1.5">{s.items.length}</Badge>
+              <span className="text-xs font-semibold text-foreground">{s.title}</span>
+              <Badge variant="outline" className="text-[10px] h-4 px-1.5 border-border text-muted-foreground">{s.items.length}</Badge>
             </div>
             {s.items.length === 0 ? (
               <p className="text-xs text-muted-foreground pl-5">✅ Tudo em dia</p>
             ) : (
               <div className="space-y-1 pl-5">
                 {s.items.slice(0, 3).map(l => (
-                  <button key={l.id} onClick={() => onSelectLead(l)} className="text-left w-full text-xs hover:bg-muted/50 rounded p-1 transition-colors">
+                  <button key={l.id} onClick={() => onSelectLead(l)} className="text-left w-full text-xs hover:bg-primary/10 rounded p-1 transition-colors text-foreground">
                     <span className="font-medium">{l.empresa}</span>
                     <span className="text-muted-foreground ml-1">· {l.bairro}</span>
                   </button>
@@ -48,6 +47,6 @@ export default function DailyPriorities({ leads, onSelectLead }: DailyPriorities
           </div>
         ))}
       </div>
-    </Card>
+    </div>
   );
 }

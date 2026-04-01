@@ -22,21 +22,21 @@ export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
   const hasFilters = Object.values(filters).some(v => v !== "");
 
   return (
-    <div className="flex flex-wrap gap-2 items-center p-3 bg-card rounded-lg border">
+    <div className="flex flex-wrap gap-2 items-center p-3 bg-card rounded-lg border border-border">
       <div className="relative flex-1 min-w-[200px]">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Buscar empresa..." value={filters.search} onChange={e => set("search", e.target.value)} className="pl-8 h-9" />
+        <Input placeholder="Buscar empresa..." value={filters.search} onChange={e => set("search", e.target.value)} className="pl-8 h-9 bg-secondary border-border" />
       </div>
       <Select value={filters.nicho || undefined} onValueChange={v => set("nicho", v)}>
-        <SelectTrigger className="w-[160px] h-9"><SelectValue placeholder="Nicho" /></SelectTrigger>
+        <SelectTrigger className="w-[160px] h-9 bg-secondary border-border"><SelectValue placeholder="Nicho" /></SelectTrigger>
         <SelectContent>{NICHOS.map(n => <SelectItem key={n} value={n}>{n}</SelectItem>)}</SelectContent>
       </Select>
       <Select value={filters.bairro || undefined} onValueChange={v => set("bairro", v)}>
-        <SelectTrigger className="w-[160px] h-9"><SelectValue placeholder="Bairro" /></SelectTrigger>
+        <SelectTrigger className="w-[160px] h-9 bg-secondary border-border"><SelectValue placeholder="Bairro" /></SelectTrigger>
         <SelectContent>{BAIRROS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
       </Select>
       <Select value={filters.temperatura || undefined} onValueChange={v => set("temperatura", v)}>
-        <SelectTrigger className="w-[120px] h-9"><SelectValue placeholder="Temp." /></SelectTrigger>
+        <SelectTrigger className="w-[120px] h-9 bg-secondary border-border"><SelectValue placeholder="Temp." /></SelectTrigger>
         <SelectContent>
           <SelectItem value="frio">❄️ Frio</SelectItem>
           <SelectItem value="morno">🌤 Morno</SelectItem>
@@ -44,7 +44,7 @@ export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
         </SelectContent>
       </Select>
       <Select value={filters.status || undefined} onValueChange={v => set("status", v)}>
-        <SelectTrigger className="w-[160px] h-9"><SelectValue placeholder="Status" /></SelectTrigger>
+        <SelectTrigger className="w-[160px] h-9 bg-secondary border-border"><SelectValue placeholder="Status" /></SelectTrigger>
         <SelectContent>
           <SelectItem value="novo">Novo</SelectItem>
           <SelectItem value="sem_contato">Sem contato</SelectItem>
@@ -58,7 +58,7 @@ export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
         </SelectContent>
       </Select>
       {hasFilters && (
-        <Button variant="ghost" size="sm" onClick={() => onChange({ search: "", nicho: "", bairro: "", temperatura: "", status: "" })}>
+        <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10" onClick={() => onChange({ search: "", nicho: "", bairro: "", temperatura: "", status: "" })}>
           <X className="h-4 w-4 mr-1" />Limpar
         </Button>
       )}
