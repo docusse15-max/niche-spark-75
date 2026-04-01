@@ -1,9 +1,10 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Lead, STATUS_LABELS, STATUS_COLORS, TEMP_COLORS, POTENTIAL_COLORS, SCRIPTS } from "@/data/leads";
-import { Phone, Instagram, MapPin, Building, MessageSquare, Copy } from "lucide-react";
+import { Phone, Instagram, MapPin, Building, MessageSquare, Copy, User } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 
@@ -11,11 +12,12 @@ interface LeadDetailSheetProps {
   lead: Lead | null;
   open: boolean;
   onClose: () => void;
-  onAddNote: (id: string, note: string) => void;
+  onAddNote: (id: string, note: string, author: string) => void;
 }
 
 export default function LeadDetailSheet({ lead, open, onClose, onAddNote }: LeadDetailSheetProps) {
   const [note, setNote] = useState("");
+  const [author, setAuthor] = useState("");
 
   if (!lead) return null;
 
@@ -26,8 +28,8 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote }: Lead
   };
 
   const handleAddNote = () => {
-    if (!note.trim()) return;
-    onAddNote(lead.id, note);
+    if (!note.trim() || !author.trim()) return;
+    onAddNote(lead.id, note, author);
     setNote("");
   };
 
@@ -38,7 +40,6 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote }: Lead
           <SheetTitle className="text-lg">{lead.empresa}</SheetTitle>
         </SheetHeader>
         <div className="mt-4 space-y-5">
-          {/* Info */}
           <div className="space-y-2">
             <div className="flex gap-2 flex-wrap">
               <Badge className={STATUS_COLORS[lead.status]}>{STATUS_LABELS[lead.status]}</Badge>
@@ -53,19 +54,16 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote }: Lead
             </div>
           </div>
 
-          {/* Descrição */}
           <div>
             <h4 className="font-semibold text-sm mb-1">Sobre o negócio</h4>
             <p className="text-sm text-muted-foreground">{lead.descricao}</p>
           </div>
 
-          {/* Motivo recorrência */}
           <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
             <h4 className="font-semibold text-sm text-emerald-800 mb-1">💡 Por que recorrência?</h4>
             <p className="text-sm text-emerald-700">{lead.motivoRecorrencia}</p>
           </div>
 
-          {/* Script rápido */}
           <div>
             <h4 className="font-semibold text-sm mb-2">📝 Script de abordagem</h4>
             <div className="space-y-2">
@@ -87,7 +85,6 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote }: Lead
             </div>
           </div>
 
-          {/* Histórico */}
           <div>
             <h4 className="font-semibold text-sm mb-2">📞 Histórico</h4>
             {lead.historico.length === 0 ? (
@@ -100,6 +97,7 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote }: Lead
                       <span className="font-medium text-xs">{h.date}</span>
                       <span className="mx-1 text-muted-foreground">·</span>
                       <span className="text-xs text-muted-foreground">{h.type}</span>
+                      {h.author && <span className="mx-1 text-xs font-medium text-primary">· {h.author}</span>}
                       <p className="text-xs">{h.note}</p>
                     </div>
                   </div>
@@ -108,16 +106,25 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote }: Lead
             )}
           </div>
 
-          {/* Anotação */}
           <div>
             <h4 className="font-semibold text-sm mb-2">✏️ Nova anotação</h4>
+            <div className="flex gap-2 mb-2">
+              <div className="relative flex-1">
+                <User className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Seu nome..."
+                  value={author}
+                  onChange={e => setAuthor(e.target.value)}
+                  className="pl-8 h-8 text-sm"
+                />
+              </div>
+            </div>
             <Textarea placeholder="Registrar contato, observação..." value={note} onChange={e => setNote(e.target.value)} className="text-sm" rows={2} />
-            <Button size="sm" className="mt-2" onClick={handleAddNote} disabled={!note.trim()}>
+            <Button size="sm" className="mt-2" onClick={handleAddNote} disabled={!note.trim() || !author.trim()}>
               <MessageSquare className="h-4 w-4 mr-1" />Registrar
             </Button>
           </div>
 
-          {/* Próxima ação */}
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-3">
             <h4 className="font-semibold text-sm mb-1">🎯 Próxima ação</h4>
             <p className="text-sm">{lead.proximaAcao}</p>

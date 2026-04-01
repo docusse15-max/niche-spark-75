@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { NICHOS, BAIRROS, RESPONSAVEIS, type Nicho, type Bairro, type LeadTemperature, type LeadStatus } from "@/data/leads";
+import { NICHOS, BAIRROS } from "@/data/leads";
 import { X, Search } from "lucide-react";
 
 export interface Filters {
@@ -10,7 +10,6 @@ export interface Filters {
   bairro: string;
   temperatura: string;
   status: string;
-  responsavel: string;
 }
 
 interface CRMFiltersProps {
@@ -58,12 +57,8 @@ export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
           <SelectItem value="perdido">Perdido</SelectItem>
         </SelectContent>
       </Select>
-      <Select value={filters.responsavel || undefined} onValueChange={v => set("responsavel", v)}>
-        <SelectTrigger className="w-[130px] h-9"><SelectValue placeholder="Responsável" /></SelectTrigger>
-        <SelectContent>{RESPONSAVEIS.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
-      </Select>
       {hasFilters && (
-        <Button variant="ghost" size="sm" onClick={() => onChange({ search: "", nicho: "", bairro: "", temperatura: "", status: "", responsavel: "" })}>
+        <Button variant="ghost" size="sm" onClick={() => onChange({ search: "", nicho: "", bairro: "", temperatura: "", status: "" })}>
           <X className="h-4 w-4 mr-1" />Limpar
         </Button>
       )}

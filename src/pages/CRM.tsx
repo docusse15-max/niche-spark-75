@@ -11,7 +11,7 @@ import ProductivityPanel from "@/components/crm/ProductivityPanel";
 import NewLeadDialog from "@/components/crm/NewLeadDialog";
 import { toast } from "@/hooks/use-toast";
 
-const EMPTY_FILTERS: Filters = { search: "", nicho: "", bairro: "", temperatura: "", status: "", responsavel: "" };
+const EMPTY_FILTERS: Filters = { search: "", nicho: "", bairro: "", temperatura: "", status: "" };
 
 export default function CRM() {
   const [leads, setLeads] = useState<Lead[]>(getInitialLeads);
@@ -32,7 +32,6 @@ export default function CRM() {
       if (filters.bairro && l.bairro !== filters.bairro) return false;
       if (filters.temperatura && l.temperatura !== filters.temperatura) return false;
       if (filters.status && l.status !== filters.status) return false;
-      if (filters.responsavel && l.responsavel !== filters.responsavel) return false;
       return true;
     });
   }, [leads, filters]);
@@ -48,18 +47,18 @@ export default function CRM() {
     toast({ title: "Status atualizado" });
   };
 
-  const handleAddNote = (id: string, note: string) => {
+  const handleAddNote = (id: string, note: string, author: string) => {
     const updated = leads.map(l => {
       if (l.id !== id) return l;
       return {
         ...l,
-        historico: [...l.historico, { date: new Date().toISOString().split("T")[0], type: "Anotação", note }],
+        historico: [...l.historico, { date: new Date().toISOString().split("T")[0], type: "Anotação", note, author }],
       };
     });
     persist(updated);
     const updatedLead = updated.find(l => l.id === id);
     if (updatedLead) setSelectedLead(updatedLead);
-    toast({ title: "Anotação registrada" });
+    toast({ title: "Anotação registrada", description: `por ${author}` });
   };
 
   const handleNewLead = (lead: Lead) => {
@@ -68,8 +67,8 @@ export default function CRM() {
   };
 
   const handleExport = () => {
-    const headers = ["Empresa", "Segmento", "Bairro", "Telefone", "Instagram", "Potencial", "Temperatura", "Status", "Responsável"];
-    const rows = leads.map(l => [l.empresa, l.segmento, l.bairro, l.telefone, l.instagram, l.potencial, l.temperatura, l.status, l.responsavel]);
+    const headers = ["Empresa", "Segmento", "Bairro", "Telefone", "Instagram", "Potencial", "Temperatura", "Status"];
+    const rows = leads.map(l => [l.empresa, l.segmento, l.bairro, l.telefone, l.instagram, l.potencial, l.temperatura, l.status]);
     const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
