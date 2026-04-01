@@ -127,6 +127,8 @@ export default function CRM() {
             <LeadsTable leads={filteredLeads} onSelectLead={handleSelectLead} onUpdateStatus={handleUpdateStatus} />
           </div>
           <div className="space-y-4">
+            <ComercialRanking leads={leads} />
+            <ContactTimeline leads={leads} onSelectLead={handleSelectLead} />
             <DailyPriorities leads={leads} onSelectLead={handleSelectLead} />
             <ProductivityPanel leads={leads} />
             <SalesArguments />
