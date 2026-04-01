@@ -14,6 +14,7 @@ interface LeadDetailSheetProps {
   open: boolean;
   onClose: () => void;
   onAddNote: (id: string, note: string, author: string) => void;
+  onDeleteLead?: (id: string) => void;
 }
 
 const DARK_STATUS: Record<string, string> = {
