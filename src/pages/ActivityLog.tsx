@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getActivityLog, ActivityLogEntry } from "@/data/leads";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,21 +8,28 @@ import logoVfmoney from "@/assets/logo-vfmoney.png";
 
 export default function ActivityLog() {
   const [log, setLog] = useState<ActivityLogEntry[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const refresh = () => setLog(getActivityLog());
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    const data = await getActivityLog();
+    setLog(data);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     refresh();
     const interval = setInterval(refresh, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [refresh]);
 
   const actionColors: Record<string, string> = {
     "status_alterado": "bg-amber-500/20 text-amber-400",
     "nota_adicionada": "bg-blue-500/20 text-blue-400",
     "lead_criado": "bg-emerald-500/20 text-emerald-400",
     "lead_exportado": "bg-purple-500/20 text-purple-400",
+    "lead_excluido": "bg-red-500/20 text-red-400",
   };
 
   return (
@@ -40,7 +47,11 @@ export default function ActivityLog() {
           <Button variant="outline" size="sm" onClick={refresh} className="border-border hover:border-primary hover:text-primary"><RefreshCw className="h-4 w-4 mr-1" />Atualizar</Button>
         </div>
 
-        {log.length === 0 ? (
+        {loading && log.length === 0 ? (
+          <div className="text-center py-16 text-muted-foreground">
+            <p className="text-lg">Carregando...</p>
+          </div>
+        ) : log.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <p className="text-lg">Nenhuma atividade registrada ainda</p>
             <p className="text-sm mt-1">As ações feitas na Central Comercial aparecerão aqui em tempo real.</p>
