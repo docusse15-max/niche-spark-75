@@ -68,7 +68,7 @@ export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
         </SelectContent>
       </Select>
       {hasFilters && (
-        <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10" onClick={() => onChange({ search: "", nicho: "", bairro: "", temperatura: "", status: "" })}>
+        <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10" onClick={() => onChange({ search: "", nicho: "", bairro: "", cidade: "", temperatura: "", status: "" })}>
           <X className="h-4 w-4 mr-1" />Limpar
         </Button>
       )}

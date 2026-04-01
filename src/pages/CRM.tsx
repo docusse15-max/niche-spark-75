@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const EMPTY_FILTERS: Filters = { search: "", nicho: "", bairro: "", temperatura: "", status: "" };
+const EMPTY_FILTERS: Filters = { search: "", nicho: "", bairro: "", cidade: "", temperatura: "", status: "" };
 
 export default function CRM() {
   const [leads, setLeads] = useState<Lead[]>(getInitialLeads);
