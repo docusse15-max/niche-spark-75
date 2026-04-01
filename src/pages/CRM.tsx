@@ -13,7 +13,7 @@ import ContactTimeline from "@/components/crm/ContactTimeline";
 import NewLeadDialog from "@/components/crm/NewLeadDialog";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { ScrollText } from "lucide-react";
+import { ScrollText, LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const EMPTY_FILTERS: Filters = { search: "", nicho: "", bairro: "", cidade: "", temperatura: "", status: "" };
