@@ -88,6 +88,16 @@ export default function CRM() {
     toast({ title: "Lead adicionado!", description: lead.empresa });
   };
 
+  const handleDeleteLead = (id: string) => {
+    const lead = leads.find(l => l.id === id);
+    const updated = leads.filter(l => l.id !== id);
+    persist(updated);
+    if (lead) {
+      addActivityLog({ action: "lead_excluido", leadEmpresa: lead.empresa, leadId: id, author: "Admin", details: "Lead removido" });
+    }
+    toast({ title: "Lead excluído" });
+  };
+
   const handleExport = () => {
     const headers = ["Empresa", "Segmento", "Bairro", "Telefone", "Instagram", "Potencial", "Temperatura", "Status"];
     const rows = leads.map(l => [l.empresa, l.segmento, l.bairro, l.telefone, l.instagram, l.potencial, l.temperatura, l.status]);
@@ -136,7 +146,7 @@ export default function CRM() {
         </div>
       </div>
 
-      <LeadDetailSheet lead={selectedLead} open={sheetOpen} onClose={() => setSheetOpen(false)} onAddNote={handleAddNote} />
+      <LeadDetailSheet lead={selectedLead} open={sheetOpen} onClose={() => setSheetOpen(false)} onAddNote={handleAddNote} onDeleteLead={handleDeleteLead} />
       <NewLeadDialog open={newLeadOpen} onClose={() => setNewLeadOpen(false)} onSave={handleNewLead} />
     </div>
   );

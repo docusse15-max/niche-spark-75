@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Lead, STATUS_LABELS, SCRIPTS } from "@/data/leads";
-import { Phone, Instagram, MapPin, Building, MessageSquare, Copy, User } from "lucide-react";
+import { Phone, Instagram, MapPin, Building, MessageSquare, Copy, User, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 
 interface LeadDetailSheetProps {
@@ -13,6 +14,7 @@ interface LeadDetailSheetProps {
   open: boolean;
   onClose: () => void;
   onAddNote: (id: string, note: string, author: string) => void;
+  onDeleteLead?: (id: string) => void;
 }
 
 const DARK_STATUS: Record<string, string> = {
@@ -27,11 +29,26 @@ const DARK_STATUS: Record<string, string> = {
   perdido: "bg-red-500/20 text-red-400",
 };
 
-export default function LeadDetailSheet({ lead, open, onClose, onAddNote }: LeadDetailSheetProps) {
+export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDeleteLead }: LeadDetailSheetProps) {
   const [note, setNote] = useState("");
   const [author, setAuthor] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState("");
 
   if (!lead) return null;
+
+  const handleDelete = () => {
+    if (deletePassword === "56239050") {
+      onDeleteLead?.(lead.id);
+      setDeleteDialogOpen(false);
+      setDeletePassword("");
+      setDeleteError("");
+      onClose();
+    } else {
+      setDeleteError("Senha incorreta");
+    }
+  };
 
   const copyScript = (text: string) => {
     const script = text.replace("[SEGMENTO]", lead.segmento);
@@ -138,7 +155,28 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote }: Lead
               <p className="text-sm text-foreground">{lead.proximaAcao}</p>
             </div>
           )}
+
+          <div className="pt-4 border-t border-border">
+            <Button variant="destructive" size="sm" onClick={() => { setDeleteDialogOpen(true); setDeletePassword(""); setDeleteError(""); }}>
+              <Trash2 className="h-4 w-4 mr-1" />Excluir Lead
+            </Button>
+          </div>
         </div>
+
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent className="bg-card border-border">
+            <DialogHeader>
+              <DialogTitle className="text-foreground">Confirmar exclusão</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">Digite a senha para excluir <strong className="text-foreground">{lead.empresa}</strong>:</p>
+            <Input type="password" placeholder="Senha..." value={deletePassword} onChange={e => { setDeletePassword(e.target.value); setDeleteError(""); }} className="bg-secondary border-border" />
+            {deleteError && <p className="text-sm text-destructive">{deleteError}</p>}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancelar</Button>
+              <Button variant="destructive" onClick={handleDelete}>Excluir</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </SheetContent>
     </Sheet>
   );
