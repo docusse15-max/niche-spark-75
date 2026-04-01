@@ -155,7 +155,28 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDele
               <p className="text-sm text-foreground">{lead.proximaAcao}</p>
             </div>
           )}
+
+          <div className="pt-4 border-t border-border">
+            <Button variant="destructive" size="sm" onClick={() => { setDeleteDialogOpen(true); setDeletePassword(""); setDeleteError(""); }}>
+              <Trash2 className="h-4 w-4 mr-1" />Excluir Lead
+            </Button>
+          </div>
         </div>
+
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent className="bg-card border-border">
+            <DialogHeader>
+              <DialogTitle className="text-foreground">Confirmar exclusão</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">Digite a senha para excluir <strong className="text-foreground">{lead.empresa}</strong>:</p>
+            <Input type="password" placeholder="Senha..." value={deletePassword} onChange={e => { setDeletePassword(e.target.value); setDeleteError(""); }} className="bg-secondary border-border" />
+            {deleteError && <p className="text-sm text-destructive">{deleteError}</p>}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancelar</Button>
+              <Button variant="destructive" onClick={handleDelete}>Excluir</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </SheetContent>
     </Sheet>
   );
