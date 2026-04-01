@@ -113,7 +113,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
     const a = document.createElement("a");
     a.href = url; a.download = "leads-recorrencia-cg.csv"; a.click();
     URL.revokeObjectURL(url);
-    addActivityLog({ action: "lead_exportado", leadEmpresa: "Base completa", leadId: "", author: "Sistema", details: `${leads.length} leads exportados` });
+    addActivityLog({ action: "lead_exportado", leadEmpresa: "Base completa", leadId: "", author: currentUser, details: `${leads.length} leads exportados` });
     toast({ title: "Base exportada!" });
   };
 
