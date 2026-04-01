@@ -1,0 +1,109 @@
+import { useState, useMemo, useCallback } from "react";
+import { Lead, LeadStatus, getInitialLeads, saveLeads } from "@/data/leads";
+import CRMHeader from "@/components/crm/CRMHeader";
+import CRMFilters, { Filters } from "@/components/crm/CRMFilters";
+import HeatMap from "@/components/crm/HeatMap";
+import LeadsTable from "@/components/crm/LeadsTable";
+import LeadDetailSheet from "@/components/crm/LeadDetailSheet";
+import DailyPriorities from "@/components/crm/DailyPriorities";
+import SalesArguments from "@/components/crm/SalesArguments";
+import ProductivityPanel from "@/components/crm/ProductivityPanel";
+import NewLeadDialog from "@/components/crm/NewLeadDialog";
+import { toast } from "@/hooks/use-toast";
+
+const EMPTY_FILTERS: Filters = { search: "", nicho: "", bairro: "", temperatura: "", status: "", responsavel: "" };
+
+export default function CRM() {
+  const [leads, setLeads] = useState<Lead[]>(getInitialLeads);
+  const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [newLeadOpen, setNewLeadOpen] = useState(false);
+
+  const persist = useCallback((updated: Lead[]) => {
+    setLeads(updated);
+    saveLeads(updated);
+  }, []);
+
+  const filteredLeads = useMemo(() => {
+    return leads.filter(l => {
+      if (filters.search && !l.empresa.toLowerCase().includes(filters.search.toLowerCase())) return false;
+      if (filters.nicho && l.segmento !== filters.nicho) return false;
+      if (filters.bairro && l.bairro !== filters.bairro) return false;
+      if (filters.temperatura && l.temperatura !== filters.temperatura) return false;
+      if (filters.status && l.status !== filters.status) return false;
+      if (filters.responsavel && l.responsavel !== filters.responsavel) return false;
+      return true;
+    });
+  }, [leads, filters]);
+
+  const handleSelectLead = (lead: Lead) => {
+    setSelectedLead(lead);
+    setSheetOpen(true);
+  };
+
+  const handleUpdateStatus = (id: string, status: LeadStatus) => {
+    const updated = leads.map(l => l.id === id ? { ...l, status, ultimoContato: new Date().toISOString().split("T")[0] } : l);
+    persist(updated);
+    toast({ title: "Status atualizado" });
+  };
+
+  const handleAddNote = (id: string, note: string) => {
+    const updated = leads.map(l => {
+      if (l.id !== id) return l;
+      return {
+        ...l,
+        historico: [...l.historico, { date: new Date().toISOString().split("T")[0], type: "Anotação", note }],
+      };
+    });
+    persist(updated);
+    const updatedLead = updated.find(l => l.id === id);
+    if (updatedLead) setSelectedLead(updatedLead);
+    toast({ title: "Anotação registrada" });
+  };
+
+  const handleNewLead = (lead: Lead) => {
+    persist([lead, ...leads]);
+    toast({ title: "Lead adicionado!", description: lead.empresa });
+  };
+
+  const handleExport = () => {
+    const headers = ["Empresa", "Segmento", "Bairro", "Telefone", "Instagram", "Potencial", "Temperatura", "Status", "Responsável"];
+    const rows = leads.map(l => [l.empresa, l.segmento, l.bairro, l.telefone, l.instagram, l.potencial, l.temperatura, l.status, l.responsavel]);
+    const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "leads-recorrencia-cg.csv"; a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: "Base exportada!" });
+  };
+
+  const handleBairroFilter = (bairro: string) => {
+    setFilters(f => ({ ...f, bairro }));
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="max-w-[1400px] mx-auto px-4 py-4 space-y-4">
+        <CRMHeader leads={leads} onNewLead={() => setNewLeadOpen(true)} onRefresh={() => { persist(getInitialLeads()); toast({ title: "Base atualizada" }); }} onExport={handleExport} />
+        <CRMFilters filters={filters} onChange={setFilters} />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <div className="lg:col-span-3 space-y-4">
+            <HeatMap leads={leads} selectedBairro={filters.bairro} onSelectBairro={handleBairroFilter} />
+            <LeadsTable leads={filteredLeads} onSelectLead={handleSelectLead} onUpdateStatus={handleUpdateStatus} />
+          </div>
+          <div className="space-y-4">
+            <DailyPriorities leads={leads} onSelectLead={handleSelectLead} />
+            <ProductivityPanel leads={leads} />
+            <SalesArguments />
+          </div>
+        </div>
+      </div>
+
+      <LeadDetailSheet lead={selectedLead} open={sheetOpen} onClose={() => setSheetOpen(false)} onAddNote={handleAddNote} />
+      <NewLeadDialog open={newLeadOpen} onClose={() => setNewLeadOpen(false)} onSave={handleNewLead} />
+    </div>
+  );
+}
