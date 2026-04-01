@@ -283,6 +283,8 @@ export function saveLeads(leads: Lead[]) {
 }
 
 // ===== ACTIVITY LOG =====
+import { supabase } from "@/integrations/supabase/client";
+
 export interface ActivityLogEntry {
   id: string;
   timestamp: string;
@@ -293,22 +295,32 @@ export interface ActivityLogEntry {
   details: string;
 }
 
-export function getActivityLog(): ActivityLogEntry[] {
-  const stored = localStorage.getItem("crm_activity_log");
-  if (stored) {
-    try { return JSON.parse(stored); } catch { /* fall through */ }
-  }
-  return [];
+export async function getActivityLog(): Promise<ActivityLogEntry[]> {
+  const { data, error } = await supabase
+    .from("activity_logs")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(500);
+  if (error || !data) return [];
+  return data.map(row => ({
+    id: row.id,
+    timestamp: row.created_at,
+    action: row.action,
+    leadEmpresa: row.lead_empresa,
+    leadId: row.lead_id,
+    author: row.author,
+    details: row.details,
+  }));
 }
 
-export function addActivityLog(entry: Omit<ActivityLogEntry, "id" | "timestamp">) {
-  const log = getActivityLog();
-  log.unshift({
-    ...entry,
-    id: Date.now().toString(),
-    timestamp: new Date().toISOString(),
+export async function addActivityLog(entry: Omit<ActivityLogEntry, "id" | "timestamp">) {
+  await supabase.from("activity_logs").insert({
+    action: entry.action,
+    lead_empresa: entry.leadEmpresa,
+    lead_id: entry.leadId,
+    author: entry.author,
+    details: entry.details,
   });
-  localStorage.setItem("crm_activity_log", JSON.stringify(log.slice(0, 500)));
 }
 
 export const SALES_ARGUMENTS = [
