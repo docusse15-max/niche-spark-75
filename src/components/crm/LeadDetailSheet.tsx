@@ -77,7 +77,7 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDele
             </div>
             <div className="grid gap-1.5 text-sm mt-3">
               <p className="flex items-center gap-2 text-foreground"><Building className="h-4 w-4 text-muted-foreground" />{lead.segmento}</p>
-              <p className="flex items-center gap-2 text-foreground"><MapPin className="h-4 w-4 text-muted-foreground" />{lead.bairro}</p>
+              <p className="flex items-center gap-2 text-foreground"><MapPin className="h-4 w-4 text-muted-foreground" />{lead.bairro} — {lead.cidade}</p>
               <p className="flex items-center gap-2 text-foreground"><Phone className="h-4 w-4 text-muted-foreground" />{lead.telefone}</p>
               <p className="flex items-center gap-2 text-foreground"><Instagram className="h-4 w-4 text-muted-foreground" />{lead.instagram}</p>
             </div>

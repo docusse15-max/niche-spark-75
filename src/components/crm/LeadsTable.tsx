@@ -72,7 +72,7 @@ export default function LeadsTable({ leads, onSelectLead, onUpdateStatus }: Lead
               <TableRow key={lead.id} className="cursor-pointer border-border hover:bg-primary/5" onClick={() => onSelectLead(lead)}>
                 <TableCell className="font-medium text-foreground">{lead.empresa}</TableCell>
                 <TableCell><span className="text-xs text-muted-foreground">{lead.segmento}</span></TableCell>
-                <TableCell><span className="text-xs text-muted-foreground">{lead.bairro}</span></TableCell>
+                <TableCell><span className="text-xs text-muted-foreground">{lead.bairro} · {lead.cidade}</span></TableCell>
                 <TableCell><Badge variant="outline" className={`text-[10px] border ${DARK_POTENTIAL[lead.potencial]}`}>{lead.potencial.toUpperCase()}</Badge></TableCell>
                 <TableCell><Badge variant="outline" className={`text-[10px] border ${DARK_TEMP[lead.temperatura]}`}>{lead.temperatura === "frio" ? "❄️" : lead.temperatura === "morno" ? "🌤" : "🔥"} {lead.temperatura}</Badge></TableCell>
                 <TableCell><Badge className={`text-[10px] border ${DARK_STATUS[lead.status]}`}>{STATUS_LABELS[lead.status]}</Badge></TableCell>

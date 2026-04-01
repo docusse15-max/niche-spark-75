@@ -1,13 +1,15 @@
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { NICHOS, BAIRROS } from "@/data/leads";
+import { NICHOS } from "@/data/leads";
+import { CIDADES } from "@/data/cities";
 import { X, Search } from "lucide-react";
 
 export interface Filters {
   search: string;
   nicho: string;
   bairro: string;
+  cidade: string;
   temperatura: string;
   status: string;
 }
@@ -34,11 +36,11 @@ export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
           {NICHOS.map(n => <SelectItem key={n} value={n}>{n}</SelectItem>)}
         </SelectContent>
       </Select>
-      <Select value={filters.bairro || "all"} onValueChange={v => set("bairro", v)}>
-        <SelectTrigger className="w-[160px] h-9 bg-secondary border-border"><SelectValue placeholder="Bairro" /></SelectTrigger>
+      <Select value={filters.cidade || "all"} onValueChange={v => set("cidade", v)}>
+        <SelectTrigger className="w-[160px] h-9 bg-secondary border-border"><SelectValue placeholder="Cidade" /></SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Todos os Bairros</SelectItem>
-          {BAIRROS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+          <SelectItem value="all">Todas as Cidades</SelectItem>
+          {CIDADES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
         </SelectContent>
       </Select>
       <Select value={filters.temperatura || "all"} onValueChange={v => set("temperatura", v)}>
@@ -66,7 +68,7 @@ export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
         </SelectContent>
       </Select>
       {hasFilters && (
-        <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10" onClick={() => onChange({ search: "", nicho: "", bairro: "", temperatura: "", status: "" })}>
+        <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10" onClick={() => onChange({ search: "", nicho: "", bairro: "", cidade: "", temperatura: "", status: "" })}>
           <X className="h-4 w-4 mr-1" />Limpar
         </Button>
       )}
