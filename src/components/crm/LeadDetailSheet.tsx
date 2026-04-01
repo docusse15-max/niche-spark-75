@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Lead, STATUS_LABELS, SCRIPTS } from "@/data/leads";
-import { Phone, Instagram, MapPin, Building, MessageSquare, Copy, User } from "lucide-react";
+import { Phone, Instagram, MapPin, Building, MessageSquare, Copy, User, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 
 interface LeadDetailSheetProps {
