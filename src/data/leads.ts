@@ -119,7 +119,6 @@ export const BAIRROS: Bairro[] = [
   "Universitário", "Outras",
 ];
 
-// Coordenadas aproximadas dos bairros de Campo Grande
 export const BAIRRO_COORDS: Record<Bairro, [number, number]> = {
   "Centro": [-20.4697, -54.6201],
   "Jardim dos Estados": [-20.4580, -54.6150],
@@ -133,7 +132,10 @@ export const BAIRRO_COORDS: Record<Bairro, [number, number]> = {
   "Outras": [-20.4900, -54.5800],
 };
 
-export const RESPONSAVEIS = ["Carlos", "Ana", "Rafael", "Juliana", "Pedro"];
+export const COMERCIAIS = ["Dorileu", "Felipe", "Gabi", "Janna"] as const;
+export type Comercial = typeof COMERCIAIS[number];
+
+export const RESPONSAVEIS = ["Dorileu", "Felipe", "Gabi", "Janna"];
 
 function lead(id: string, empresa: string, segmento: Nicho, bairro: Bairro, telefone: string, instagram: string, potencial: LeadPotential, descricao: string, motivoRecorrencia: string): Lead {
   const base = BAIRRO_COORDS[bairro];
@@ -147,80 +149,116 @@ function lead(id: string, empresa: string, segmento: Nicho, bairro: Bairro, tele
   };
 }
 
-const MOCK_LEADS: Lead[] = [
-  // CENTRO
-  lead("1", "Odonto Premium", "Odontologia", "Centro", "(67) 99703-9012", "@odontopremium", "premium", "Rede de clínicas odontológicas com foco em implantes e ortodontia.", "Pacientes precisam de manutenções semestrais."),
-  lead("2", "ContaFácil", "Contabilidade", "Centro", "(67) 99307-3344", "@contafacil.cg", "medio", "Escritório de contabilidade focado em PMEs e MEIs.", "Já opera com contratos recorrentes."),
-  lead("3", "CleanPro Serviços", "Limpeza Empresarial", "Centro", "(67) 98812-2200", "@cleanpro.cg", "premium", "Limpeza e conservação predial para escritórios.", "Contratos mensais são o padrão do setor."),
-  lead("4", "Sorriso Perfeito", "Odontologia", "Centro", "(67) 99111-2233", "@sorrisoperfeito", "alto", "Clínica de ortodontia e clareamento dental.", "Tratamentos longos geram recorrência natural."),
-  lead("5", "Espaço Zen Yoga", "Academia", "Centro", "(67) 99222-3344", "@espacozen.cg", "medio", "Studio de yoga e pilates no centro.", "Alunos mensalistas, alta fidelização."),
-  lead("6", "Barber King CG", "Salão de Beleza", "Centro", "(67) 99333-4455", "@barberking.cg", "medio", "Barbearia premium masculina.", "Clientes voltam a cada 15-20 dias."),
-  lead("7", "Tech Solutions CG", "Serviços B2B", "Centro", "(67) 99444-5566", "@techsolutions.cg", "alto", "Suporte de TI para empresas.", "Contratos mensais de suporte."),
+// ===== EMPRESA NAMES PER NICHO =====
+const EMPRESA_NAMES: Record<Nicho, string[]> = {
+  "Clínica de Estética": ["Estética Prime", "Bella Vita", "Dermavida", "Skin Center", "Corpo Ideal", "Estética Royal", "Beleza Pura", "Glow Clinic", "Estética Avançada", "Face Art", "Beauty Lab", "Estética Zen", "DermaGold", "Pele Perfeita", "Estética Sublime", "Beauty Premium", "Harmonia Facial", "Spa Beleza", "Estética Renova", "Studio Beauty"],
+  "Odontologia": ["Odonto Premium", "Sorriso Perfeito", "Dente Saudável", "Odonto Smile", "Oral Center", "Clínica Sorriso", "Odonto Plus", "Dental Care CG", "OdontoVida", "Sorriso CG", "Implante Fácil", "Dental Gold", "Odonto Master", "Sorriso Real", "Dental Prime", "OdontoExcel", "Clínica Dental Art", "Odonto Family", "Sorriso Brilhante", "Dental Saúde"],
+  "Pet Shop": ["PetLove CG", "Vet Life", "Dog & Cat Pet", "PetBanho", "Pet Center", "Bicho Bom", "Pet Feliz", "Au Au Pet", "Miau & Cia", "Pet Paradise", "Animal Planet CG", "Pet Amigo", "Vet Care CG", "PetClean", "Pet Saúde", "Animal Life", "Pet Style", "Vet Plus", "PetMania", "Zoo Pet"],
+  "Academia": ["CrossFit CG Box", "Gym Power", "Studio Fitness Pro", "Academia Flex", "Espaço Zen Yoga", "Iron Body", "Fit & Strong", "Power Gym", "Body Tech CG", "Fitness Gold", "Muscle Factory", "Energy Gym", "Funcional CG", "Alpha Fitness", "Strong Body", "Mega Gym", "Wellness Studio", "Fit4Life", "Pro Training", "Athletic Center"],
+  "Clínica de Saúde": ["Clínica Derma Plus", "Clínica Vitalis", "Saúde Integral", "MedCenter CG", "Clínica Vida", "Centro Médico CG", "Clínica Saúde+", "MedVida", "Clínica Bem Estar", "Saúde Premium", "Centro Clínico CG", "Clínica Harmonia", "MedGold", "Clínica Popular CG", "Saúde Total", "Clínica Nova Vida", "MedPlus CG", "Clínica Esperança", "Centro Saúde", "Clínica Renascer"],
+  "Nutrição": ["Dra. Camila Nutrição", "Nutri Vida", "Nutri Fit", "Nutri Balance", "Saúde no Prato", "Nutri Corpo", "NutriPlan CG", "Nutri Gold", "Vida Saudável", "Nutri Expert", "NutriCenter", "Dieta Certa", "Nutri Soul", "Nutri Funcional", "Nutri Prime", "Nutri Lab", "Nutri Natural", "Nutri Wellness", "Nutri Plus CG", "Nutri Master"],
+  "Psicologia": ["Psi Mente", "Espaço Terapia", "Mente Viva", "Psi Center", "Equilíbrio Mental", "Psi Saúde", "Mente Plena", "Psi Care", "Sentir & Ser", "Psi Gold", "Clínica da Mente", "Psi Bem Estar", "Mente & Corpo", "Psi Integral", "Psi Acolher", "Mente Livre", "Psi Harmonia", "Mente Sã", "Psi Renova", "Psi Evolução"],
+  "Automotivo": ["Auto Shine Detailing", "Lava Jato Premium", "Auto Center", "Mecânica do Povo", "Car Clean", "Auto Pro", "Speed Car", "Auto Gold", "Car Spa", "Auto Brilho", "MasterCar", "Auto Express", "Car Premium", "Auto Mais", "Auto Total", "Car Life", "Auto Élite", "Speed Lav", "Auto Clean CG", "Car Tech"],
+  "Serviços B2B": ["Tech Solutions CG", "Copy & Print", "Solar Clean", "ContaFácil", "Empada da Boa", "Digital Force", "Promo CG", "Marketing Pro", "Data Systems", "Office Solutions", "BizTech CG", "Smart Services", "Pro Solutions", "Connect CG", "Inova Serviços", "Alfa Soluções", "NetWork CG", "Business Pro", "Serv Mais", "Soluções CG"],
+  "Salão de Beleza": ["Barber King CG", "Salão da Rê", "Beleza & Arte", "Instituto Cabelo", "Barbearia Corte Certo", "Studio Hair", "Hair Gold", "Beleza Express", "Salão Premium", "Corte & Estilo", "Hair Master", "Salão Charme", "Beauty Hair", "Hair Pro", "Salão da Ana", "Barbearia Style", "Hair Center", "Salão Glamour", "Corte & Cor", "Hair Studio"],
+  "Fisioterapia": ["Fisio Move", "Fisio Integral", "Fisio Life", "Fisio Center", "Fisio Plus", "Fisio Gold", "Reabilitar CG", "Fisio Sport", "Corpo Ativo", "Fisio Saúde", "Fisio Expert", "Fisio Premium", "Fisio Funcional", "Reab Center", "Fisio Body", "Fisio Care", "Movimento Vital", "Fisio Total", "Fisio Bem Estar", "Fisio Master"],
+  "Educação": ["English Now CG", "Escola Futuro Brilhante", "CursoCG", "Aprender+", "Instituto Saber", "Escola Moderna", "Educação Prime", "Centro Educacional", "Saber Mais CG", "Instituto CG", "Academia do Saber", "Escola Tech", "Cursinho CG", "EduCenter", "Aprendiz CG", "Escola Nova", "Instituto Ensino", "Edu Plus", "Escola Criativa", "Centro de Cursos"],
+  "Coworking": ["Smart Cowork", "Espaço Maker", "Hub CG", "Cowork Prime", "Office Hub", "Work Center", "Co.Lab CG", "Cowork Gold", "StartHub", "Work Space CG", "Business Hub", "Cowork Plus", "Innovation Hub", "Desk CG", "Work & Create", "Cowork Life", "Hub Digital", "Space Work", "Cowork Connect", "Office Share"],
+  "Contabilidade": ["ContaFácil", "Contabilidade Prime", "Conta Certa", "ContaGold", "Fiscal Plus", "Contabil CG", "Conta Fiel", "ContaMais", "Gestão Contábil", "Contabil Expert", "Conta Pro", "Fiscal CG", "ContaCenter", "Gestão Fiscal", "ContaExpress", "Fiscal Total", "Conta Master", "ContaVida", "Gestão CG", "Fiscal Prime"],
+  "Limpeza Empresarial": ["CleanPro", "Clean House", "Limpeza Total MS", "Super Clean", "Clean Gold", "Clean Express", "Limpeza Premium", "Clean Master", "Higiene Total", "Clean & Shine", "Limpeza Pro", "Clean Care", "Brilho Total", "Clean Force", "Limpeza Fácil", "Clean Jet", "Limpeza CG", "Clean Star", "Limpeza Excel", "Clean Plus"],
+};
 
-  // JARDIM DOS ESTADOS
-  lead("8", "Estética Bella Donna", "Clínica de Estética", "Jardim dos Estados", "(67) 99901-1234", "@belladonna.cg", "premium", "Clínica premium de harmonização facial.", "Alta frequência de retorno. Ticket médio R$800+."),
-  lead("9", "Psi Mente", "Psicologia", "Jardim dos Estados", "(67) 99208-5566", "@psimente.cg", "alto", "Clínica de psicologia presencial e online.", "Terapia é naturalmente recorrente."),
-  lead("10", "Clínica Derma Plus", "Clínica de Saúde", "Jardim dos Estados", "(67) 98614-4400", "@dermaplus.cg", "premium", "Dermatologia com tratamentos estéticos.", "Tratamentos requerem múltiplas sessões."),
-  lead("11", "Spa & Soul", "Clínica de Estética", "Jardim dos Estados", "(67) 99555-6677", "@spaesoul.cg", "alto", "Day spa com tratamentos corporais.", "Pacotes mensais de relaxamento."),
-  lead("12", "Dra. Camila Nutrição", "Nutrição", "Jardim dos Estados", "(67) 99666-7788", "@dracamilanutri", "alto", "Nutricionista esportiva e funcional.", "Acompanhamento mensal contínuo."),
-  lead("13", "Instituto Cabelo & Cia", "Salão de Beleza", "Jardim dos Estados", "(67) 99777-8899", "@cabeloecia.cg", "medio", "Salão premium feminino.", "Clientes fiéis com visitas quinzenais."),
+const DESCRICOES: Record<Nicho, string> = {
+  "Clínica de Estética": "Clínica especializada em procedimentos estéticos faciais e corporais.",
+  "Odontologia": "Clínica odontológica com foco em tratamentos preventivos e estéticos.",
+  "Pet Shop": "Pet shop completo com banho, tosa, veterinário e produtos.",
+  "Academia": "Espaço fitness com musculação, aulas coletivas e personal trainer.",
+  "Clínica de Saúde": "Clínica médica multiespecialidade com atendimento contínuo.",
+  "Nutrição": "Consultório de nutrição com acompanhamento mensal personalizado.",
+  "Psicologia": "Clínica de psicologia com atendimento individual e em grupo.",
+  "Automotivo": "Centro automotivo com serviços de manutenção e estética veicular.",
+  "Serviços B2B": "Empresa de serviços corporativos com contratos empresariais.",
+  "Salão de Beleza": "Salão com serviços de cabelo, unhas, maquiagem e estética.",
+  "Fisioterapia": "Clínica de fisioterapia com reabilitação e prevenção.",
+  "Educação": "Instituição de ensino com cursos e acompanhamento contínuo.",
+  "Coworking": "Espaço de trabalho compartilhado com planos mensais.",
+  "Contabilidade": "Escritório contábil com gestão fiscal e tributária.",
+  "Limpeza Empresarial": "Empresa de limpeza e conservação para espaços comerciais.",
+};
 
-  // CHÁCARA CACHOEIRA
-  lead("14", "PetLove CG", "Pet Shop", "Chácara Cachoeira", "(67) 99802-5678", "@petlovecg", "alto", "Pet shop completo com banho, tosa e vet.", "400+ clientes fixos de banho e tosa."),
-  lead("15", "Smart Cowork", "Coworking", "Chácara Cachoeira", "(67) 98713-3300", "@smartcowork", "medio", "Coworking com salas de reunião.", "Modelo já é recorrente."),
-  lead("16", "CrossFit CG Box", "Academia", "Chácara Cachoeira", "(67) 99888-9900", "@crossfitcg", "alto", "Box de CrossFit com 180 atletas.", "Mensalidades recorrentes, comunidade forte."),
-  lead("17", "Vet Life CG", "Pet Shop", "Chácara Cachoeira", "(67) 99999-0011", "@vetlife.cg", "alto", "Clínica veterinária 24h.", "Plano de saúde pet é tendência."),
-  lead("18", "Espaço Maker CG", "Coworking", "Chácara Cachoeira", "(67) 98100-1122", "@espacomaker", "medio", "Coworking criativo e eventos.", "Planos mensais de uso."),
+const MOTIVOS: Record<Nicho, string> = {
+  "Clínica de Estética": "Tratamentos estéticos requerem múltiplas sessões e manutenção contínua.",
+  "Odontologia": "Manutenção ortodôntica e check-ups semestrais geram recorrência natural.",
+  "Pet Shop": "Banho e tosa mensal, ração por assinatura, plano de saúde pet.",
+  "Academia": "Mensalidades recorrentes são o modelo padrão do setor.",
+  "Clínica de Saúde": "Acompanhamento de pacientes crônicos e check-ups periódicos.",
+  "Nutrição": "Consultas mensais de acompanhamento e planos alimentares.",
+  "Psicologia": "Terapia é naturalmente recorrente com sessões semanais/quinzenais.",
+  "Automotivo": "Manutenção preventiva periódica e lavagem recorrente.",
+  "Serviços B2B": "Contratos de serviço mensal são padrão no segmento.",
+  "Salão de Beleza": "Clientes retornam a cada 15-30 dias para manutenção.",
+  "Fisioterapia": "Sessões contínuas por semanas/meses com pacotes de tratamento.",
+  "Educação": "Mensalidades de cursos e acompanhamento educacional contínuo.",
+  "Coworking": "Planos mensais de uso do espaço e serviços adicionais.",
+  "Contabilidade": "Honorários mensais fixos para gestão contábil e fiscal.",
+  "Limpeza Empresarial": "Contratos mensais/quinzenais de limpeza e conservação.",
+};
 
-  // SANTA FÉ
-  lead("19", "Studio Fitness Pro", "Academia", "Santa Fé", "(67) 99604-3456", "@studiofitpro", "alto", "Studio de musculação e funcional.", "200 alunos, plano mensal."),
-  lead("20", "Pet Center Santa Fé", "Pet Shop", "Santa Fé", "(67) 98200-2233", "@petcentersf", "medio", "Pet shop de bairro com banho e tosa.", "Clientes mensais fiéis."),
-  lead("21", "Estética Natural", "Clínica de Estética", "Santa Fé", "(67) 98300-3344", "@esteticanatural.cg", "alto", "Tratamentos estéticos naturais e orgânicos.", "Pacotes de tratamento contínuo."),
-  lead("22", "Auto Center SF", "Automotivo", "Santa Fé", "(67) 98400-4455", "@autocentersf", "medio", "Oficina mecânica e troca de óleo.", "Manutenção preventiva recorrente."),
-  lead("23", "Escola Futuro Brilhante", "Educação", "Santa Fé", "(67) 98500-5566", "@futurobrilhante", "medio", "Reforço escolar e cursos.", "Mensalidades recorrentes."),
+function generatePhone(): string {
+  const prefix = ["67"];
+  const mid = ["99", "98", "97", "96"];
+  const p = prefix[0];
+  const m = mid[Math.floor(Math.random() * mid.length)];
+  const n1 = String(Math.floor(Math.random() * 900) + 100);
+  const n2 = String(Math.floor(Math.random() * 9000) + 1000);
+  return `(${p}) ${m}${n1}-${n2}`;
+}
 
-  // AERO RANCHO
-  lead("24", "Lava Jato Premium CG", "Automotivo", "Aero Rancho", "(67) 99109-7788", "@lavajatopremium", "alto", "Lava-rápido premium com estética automotiva.", "300 clientes/mês, potencial para plano."),
-  lead("25", "Salão da Rê", "Salão de Beleza", "Aero Rancho", "(67) 98600-6677", "@salaodarecg", "medio", "Salão popular com grande volume.", "Alto fluxo de clientes recorrentes."),
-  lead("26", "Gym Power", "Academia", "Aero Rancho", "(67) 98700-7788", "@gympower.cg", "alto", "Academia grande com 500+ alunos.", "Base enorme para fidelização."),
-  lead("27", "PetBanho AR", "Pet Shop", "Aero Rancho", "(67) 98800-8899", "@petbanhoar", "medio", "Banho e tosa delivery.", "Serviço recorrente por natureza."),
-  lead("28", "Mecânica do Povo", "Automotivo", "Aero Rancho", "(67) 98900-9900", "@mecanicadopovo", "baixo", "Oficina popular com grande fluxo.", "Revisão periódica gera recorrência."),
+function generateLeads(): Lead[] {
+  const leads: Lead[] = [];
+  let id = 1;
+  const potenciais: LeadPotential[] = ["baixo", "medio", "alto", "premium"];
+  const potencialWeights = [0.15, 0.35, 0.35, 0.15];
 
-  // VILA ALBA
-  lead("29", "Beleza & Arte Salon", "Salão de Beleza", "Vila Alba", "(67) 99010-9900", "@belezaarte.cg", "medio", "Salão completo com cabelo, unha e maquiagem.", "Clientes fiéis retornam mensalmente."),
-  lead("30", "Fisio Move", "Fisioterapia", "Vila Alba", "(67) 97100-1122", "@fisiomove.cg", "alto", "Fisioterapia esportiva e ortopédica.", "Sessões contínuas por semanas/meses."),
-  lead("31", "Dente Saudável", "Odontologia", "Vila Alba", "(67) 97200-2233", "@dentesaudavel", "alto", "Odontologia preventiva familiar.", "Check-ups semestrais, plano preventivo."),
-  lead("32", "Empada da Boa", "Serviços B2B", "Vila Alba", "(67) 97300-3344", "@empadadaboa", "baixo", "Fornecimento de salgados para eventos.", "Contratos de fornecimento regular."),
+  function pickPotencial(): LeadPotential {
+    const r = Math.random();
+    let cum = 0;
+    for (let i = 0; i < potenciais.length; i++) {
+      cum += potencialWeights[i];
+      if (r < cum) return potenciais[i];
+    }
+    return "medio";
+  }
 
-  // VILA NASSER
-  lead("33", "Auto Shine Detailing", "Automotivo", "Vila Nasser", "(67) 99505-7890", "@autoshinecg", "alto", "Detailing automotivo premium.", "Clientes de alto padrão, manutenção mensal."),
-  lead("34", "Clínica Vitalis", "Clínica de Saúde", "Vila Nasser", "(67) 97400-4455", "@clinicavitalis", "alto", "Clínica médica geral.", "Acompanhamento contínuo de pacientes crônicos."),
-  lead("35", "Studio Pilates VN", "Academia", "Vila Nasser", "(67) 97500-5566", "@studiopilatesvn", "medio", "Pilates e funcional para mulheres.", "Alunas mensalistas fiéis."),
-  lead("36", "Dog & Cat Pet", "Pet Shop", "Vila Nasser", "(67) 97600-6677", "@dogcatpet.cg", "medio", "Pet shop completo.", "Banho mensal recorrente."),
+  // Distribute ~300 leads across nichos and bairros
+  for (const nicho of NICHOS) {
+    const names = EMPRESA_NAMES[nicho];
+    const count = Math.floor(300 / NICHOS.length); // ~20 per nicho
+    for (let i = 0; i < count && i < names.length; i++) {
+      const bairro = BAIRROS[Math.floor(Math.random() * BAIRROS.length)];
+      const empresa = names[i] + (bairro !== "Outras" ? ` ${bairro.split(" ")[0]}` : "");
+      const instagram = `@${names[i].toLowerCase().replace(/[^a-z0-9]/g, "")}.cg`;
+      leads.push(lead(
+        String(id++),
+        empresa,
+        nicho,
+        bairro,
+        generatePhone(),
+        instagram,
+        pickPotencial(),
+        DESCRICOES[nicho],
+        MOTIVOS[nicho],
+      ));
+    }
+  }
 
-  // CORONEL ANTONINO
-  lead("37", "Fisio Integral", "Fisioterapia", "Coronel Antonino", "(67) 98911-1100", "@fisiointegral", "alto", "Fisioterapia e reabilitação.", "Pacientes com sessões contínuas."),
-  lead("38", "Clínica Odonto Smile", "Odontologia", "Coronel Antonino", "(67) 97700-7788", "@odontosmile.cg", "alto", "Odontologia estética e implantes.", "Manutenção de implantes é recorrente."),
-  lead("39", "Clean House CG", "Limpeza Empresarial", "Coronel Antonino", "(67) 97800-8899", "@cleanhouse.cg", "medio", "Limpeza residencial e comercial.", "Serviço semanal/quinzenal recorrente."),
-  lead("40", "Espaço Terapia", "Psicologia", "Coronel Antonino", "(67) 97900-9900", "@espacoterapia", "alto", "Clínica multidisciplinar de psicologia.", "Terapia é recorrência pura."),
+  return leads;
+}
 
-  // UNIVERSITÁRIO
-  lead("41", "Nutri Vida", "Nutrição", "Universitário", "(67) 99406-1122", "@nutrivida.cg", "medio", "Nutrição com acompanhamento mensal.", "150 pacientes ativos mensais."),
-  lead("42", "English Now CG", "Educação", "Universitário", "(67) 98515-5500", "@englishnowcg", "medio", "Escola de inglês e espanhol.", "120 alunos mensalistas."),
-  lead("43", "Academia Flex", "Academia", "Universitário", "(67) 96100-1122", "@academiaflex.cg", "alto", "Academia perto da UFMS.", "Alta rotação de alunos, fidelização é chave."),
-  lead("44", "Copy & Print Uni", "Serviços B2B", "Universitário", "(67) 96200-2233", "@copyprintuni", "baixo", "Gráfica rápida universitária.", "Planos mensais para empresas."),
-  lead("45", "Barbearia Corte Certo", "Salão de Beleza", "Universitário", "(67) 96300-3344", "@cortecerto.cg", "medio", "Barbearia moderna universitária.", "Clientes a cada 15 dias."),
-
-  // OUTRAS
-  lead("46", "Fazenda Fit", "Academia", "Outras", "(67) 96400-4455", "@fazendafit.cg", "alto", "Academia rural premium na saída para Sidrolândia.", "Público fiel, pouca concorrência."),
-  lead("47", "Clínica VetMais", "Pet Shop", "Outras", "(67) 96500-5566", "@vetmais.cg", "alto", "Clínica vet na região do Noroeste.", "Plano de saúde pet é mercado virgem."),
-  lead("48", "Solar Clean Energy", "Serviços B2B", "Outras", "(67) 96600-6677", "@solarclean.cg", "premium", "Manutenção de painéis solares.", "Assinatura de manutenção preventiva."),
-  lead("49", "Estética Corpo & Alma", "Clínica de Estética", "Outras", "(67) 96700-7788", "@corpoealma.cg", "alto", "Estética corporal e facial.", "Tratamentos requerem múltiplas sessões."),
-  lead("50", "Limpeza Total MS", "Limpeza Empresarial", "Outras", "(67) 96800-8899", "@limpezatotal.ms", "alto", "Limpeza industrial e comercial.", "Contratos mensais de grande porte."),
-];
+const MOCK_LEADS: Lead[] = generateLeads();
 
 export function getInitialLeads(): Lead[] {
-  const stored = localStorage.getItem("crm_leads_v2");
+  const stored = localStorage.getItem("crm_leads_v3");
   if (stored) {
     try { return JSON.parse(stored); } catch { /* fall through */ }
   }
@@ -228,7 +266,7 @@ export function getInitialLeads(): Lead[] {
 }
 
 export function saveLeads(leads: Lead[]) {
-  localStorage.setItem("crm_leads_v2", JSON.stringify(leads));
+  localStorage.setItem("crm_leads_v3", JSON.stringify(leads));
 }
 
 // ===== ACTIVITY LOG =====
