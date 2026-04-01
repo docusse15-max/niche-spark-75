@@ -9,6 +9,7 @@ export interface Filters {
   search: string;
   nicho: string;
   bairro: string;
+  cidade: string;
   temperatura: string;
   status: string;
 }
