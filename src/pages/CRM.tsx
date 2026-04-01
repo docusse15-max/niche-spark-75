@@ -132,9 +132,17 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
         </div>
         <div className="flex items-center justify-between">
           <div className="flex-1"><CRMFilters filters={filters} onChange={setFilters} /></div>
-          <Button variant="outline" size="sm" className="ml-2 shrink-0" onClick={() => navigate("/log")}>
-            <ScrollText className="h-4 w-4 mr-1" />Log
-          </Button>
+          <div className="flex items-center gap-2 ml-2 shrink-0">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground border rounded-md px-2 py-1.5">
+              <User className="h-3.5 w-3.5" />{currentUser}
+            </span>
+            <Button variant="outline" size="sm" onClick={() => navigate("/log")}>
+              <ScrollText className="h-4 w-4 mr-1" />Log
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onLogout} className="text-muted-foreground hover:text-destructive">
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
