@@ -13,12 +13,17 @@ import ContactTimeline from "@/components/crm/ContactTimeline";
 import NewLeadDialog from "@/components/crm/NewLeadDialog";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { ScrollText } from "lucide-react";
+import { ScrollText, LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const EMPTY_FILTERS: Filters = { search: "", nicho: "", bairro: "", cidade: "", temperatura: "", status: "" };
 
-export default function CRM() {
+interface CRMProps {
+  currentUser: string;
+  onLogout: () => void;
+}
+
+export default function CRM({ currentUser, onLogout }: CRMProps) {
   const [leads, setLeads] = useState<Lead[]>(getInitialLeads);
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
@@ -61,7 +66,7 @@ export default function CRM() {
     const updated = leads.map(l => l.id === id ? { ...l, status, ultimoContato: new Date().toISOString().split("T")[0] } : l);
     persist(updated);
     if (lead) {
-      addActivityLog({ action: "status_alterado", leadEmpresa: lead.empresa, leadId: id, author: "Sistema", details: `Status → ${status}` });
+      addActivityLog({ action: "status_alterado", leadEmpresa: lead.empresa, leadId: id, author: currentUser, details: `Status → ${status}` });
     }
     toast({ title: "Status atualizado" });
   };
@@ -85,7 +90,7 @@ export default function CRM() {
 
   const handleNewLead = (lead: Lead) => {
     persist([lead, ...leads]);
-    addActivityLog({ action: "lead_criado", leadEmpresa: lead.empresa, leadId: lead.id, author: "Sistema", details: `${lead.segmento} · ${lead.bairro}` });
+    addActivityLog({ action: "lead_criado", leadEmpresa: lead.empresa, leadId: lead.id, author: currentUser, details: `${lead.segmento} · ${lead.bairro}` });
     toast({ title: "Lead adicionado!", description: lead.empresa });
   };
 
@@ -94,7 +99,7 @@ export default function CRM() {
     const updated = leads.filter(l => l.id !== id);
     persist(updated);
     if (lead) {
-      addActivityLog({ action: "lead_excluido", leadEmpresa: lead.empresa, leadId: id, author: "Admin", details: "Lead removido" });
+      addActivityLog({ action: "lead_excluido", leadEmpresa: lead.empresa, leadId: id, author: currentUser, details: "Lead removido" });
     }
     toast({ title: "Lead excluído" });
   };
@@ -108,7 +113,7 @@ export default function CRM() {
     const a = document.createElement("a");
     a.href = url; a.download = "leads-recorrencia-cg.csv"; a.click();
     URL.revokeObjectURL(url);
-    addActivityLog({ action: "lead_exportado", leadEmpresa: "Base completa", leadId: "", author: "Sistema", details: `${leads.length} leads exportados` });
+    addActivityLog({ action: "lead_exportado", leadEmpresa: "Base completa", leadId: "", author: currentUser, details: `${leads.length} leads exportados` });
     toast({ title: "Base exportada!" });
   };
 
@@ -127,9 +132,17 @@ export default function CRM() {
         </div>
         <div className="flex items-center justify-between">
           <div className="flex-1"><CRMFilters filters={filters} onChange={setFilters} /></div>
-          <Button variant="outline" size="sm" className="ml-2 shrink-0" onClick={() => navigate("/log")}>
-            <ScrollText className="h-4 w-4 mr-1" />Log
-          </Button>
+          <div className="flex items-center gap-2 ml-2 shrink-0">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground border rounded-md px-2 py-1.5">
+              <User className="h-3.5 w-3.5" />{currentUser}
+            </span>
+            <Button variant="outline" size="sm" onClick={() => navigate("/log")}>
+              <ScrollText className="h-4 w-4 mr-1" />Log
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onLogout} className="text-muted-foreground hover:text-destructive">
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
