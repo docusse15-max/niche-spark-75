@@ -8,6 +8,8 @@ import LeadDetailSheet from "@/components/crm/LeadDetailSheet";
 import DailyPriorities from "@/components/crm/DailyPriorities";
 import SalesArguments from "@/components/crm/SalesArguments";
 import ProductivityPanel from "@/components/crm/ProductivityPanel";
+import ComercialRanking from "@/components/crm/ComercialRanking";
+import ContactTimeline from "@/components/crm/ContactTimeline";
 import NewLeadDialog from "@/components/crm/NewLeadDialog";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
