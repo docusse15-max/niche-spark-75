@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Lead } from "@/data/leads";
 import { RefreshCw, Plus, Download, Users, UserPlus, Phone, CalendarCheck, FileText, Trophy } from "lucide-react";
+import logoVfmoney from "@/assets/logo-vfmoney.png";
 
 interface CRMHeaderProps {
   leads: Lead[];
@@ -23,9 +24,12 @@ export default function CRMHeader({ leads, onNewLead, onRefresh, onExport }: CRM
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Central Comercial de Leads</h1>
-          <p className="text-sm text-muted-foreground">Recorrência Campo Grande — Base estruturada para prospecção, acompanhamento e fechamento</p>
+        <div className="flex items-center gap-3">
+          <img src={logoVfmoney} alt="VF Money" className="h-10 w-auto" />
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Central Comercial de Leads</h1>
+            <p className="text-sm text-muted-foreground">Recorrência Campo Grande — Base estruturada para prospecção, acompanhamento e fechamento</p>
+          </div>
         </div>
         <div className="flex gap-2 flex-wrap">
           <Button variant="outline" size="sm" onClick={onRefresh}><RefreshCw className="h-4 w-4 mr-1" />Atualizar</Button>
