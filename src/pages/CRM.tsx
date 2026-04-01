@@ -99,7 +99,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
     const updated = leads.filter(l => l.id !== id);
     persist(updated);
     if (lead) {
-      addActivityLog({ action: "lead_excluido", leadEmpresa: lead.empresa, leadId: id, author: "Admin", details: "Lead removido" });
+      addActivityLog({ action: "lead_excluido", leadEmpresa: lead.empresa, leadId: id, author: currentUser, details: "Lead removido" });
     }
     toast({ title: "Lead excluído" });
   };
