@@ -258,7 +258,7 @@ function generateLeads(): Lead[] {
 const MOCK_LEADS: Lead[] = generateLeads();
 
 export function getInitialLeads(): Lead[] {
-  const stored = localStorage.getItem("crm_leads_v3");
+  const stored = localStorage.getItem("crm_leads_v4");
   if (stored) {
     try { return JSON.parse(stored); } catch { /* fall through */ }
   }
