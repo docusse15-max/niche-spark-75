@@ -90,7 +90,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
 
   const handleNewLead = (lead: Lead) => {
     persist([lead, ...leads]);
-    addActivityLog({ action: "lead_criado", leadEmpresa: lead.empresa, leadId: lead.id, author: "Sistema", details: `${lead.segmento} · ${lead.bairro}` });
+    addActivityLog({ action: "lead_criado", leadEmpresa: lead.empresa, leadId: lead.id, author: currentUser, details: `${lead.segmento} · ${lead.bairro}` });
     toast({ title: "Lead adicionado!", description: lead.empresa });
   };
 
