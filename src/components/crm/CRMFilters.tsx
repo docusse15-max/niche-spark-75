@@ -35,7 +35,7 @@ export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
         <SelectTrigger className="w-[160px] h-9 bg-secondary border-border"><SelectValue placeholder="Bairro" /></SelectTrigger>
         <SelectContent>{BAIRROS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
       </Select>
-      <Select value={filters.temperatura || undefined} onValueChange={v => set("temperatura", v)}>
+      <Select value={filters.temperatura} onValueChange={v => set("temperatura", v)}>
         <SelectTrigger className="w-[120px] h-9 bg-secondary border-border"><SelectValue placeholder="Temp." /></SelectTrigger>
         <SelectContent>
           <SelectItem value="frio">❄️ Frio</SelectItem>
@@ -43,7 +43,7 @@ export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
           <SelectItem value="quente">🔥 Quente</SelectItem>
         </SelectContent>
       </Select>
-      <Select value={filters.status || undefined} onValueChange={v => set("status", v)}>
+      <Select value={filters.status} onValueChange={v => set("status", v)}>
         <SelectTrigger className="w-[160px] h-9 bg-secondary border-border"><SelectValue placeholder="Status" /></SelectTrigger>
         <SelectContent>
           <SelectItem value="novo">Novo</SelectItem>
