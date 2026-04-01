@@ -3,12 +3,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Lead, STATUS_LABELS, STATUS_COLORS, TEMP_COLORS, POTENTIAL_COLORS, LeadStatus } from "@/data/leads";
-import { MoreVertical, Eye, MessageSquare, ArrowRightLeft, Clock, FileText, Trophy } from "lucide-react";
+import { MoreVertical, Eye, MessageSquare, Clock, FileText, Trophy } from "lucide-react";
 
 interface LeadsTableProps {
   leads: Lead[];
   onSelectLead: (lead: Lead) => void;
   onUpdateStatus: (id: string, status: LeadStatus) => void;
+}
+
+function getLastAuthor(lead: Lead): string {
+  if (lead.historico.length === 0) return "—";
+  const last = lead.historico[lead.historico.length - 1];
+  return last.author || "—";
 }
 
 export default function LeadsTable({ leads, onSelectLead, onUpdateStatus }: LeadsTableProps) {
@@ -27,7 +33,7 @@ export default function LeadsTable({ leads, onSelectLead, onUpdateStatus }: Lead
               <TableHead>Potencial</TableHead>
               <TableHead>Temp.</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Responsável</TableHead>
+              <TableHead>Última interação</TableHead>
               <TableHead>Próxima Ação</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
@@ -44,7 +50,7 @@ export default function LeadsTable({ leads, onSelectLead, onUpdateStatus }: Lead
                 <TableCell><Badge variant="outline" className={`text-[10px] ${POTENTIAL_COLORS[lead.potencial]}`}>{lead.potencial.toUpperCase()}</Badge></TableCell>
                 <TableCell><Badge variant="outline" className={`text-[10px] ${TEMP_COLORS[lead.temperatura]}`}>{lead.temperatura === "frio" ? "❄️" : lead.temperatura === "morno" ? "🌤" : "🔥"} {lead.temperatura}</Badge></TableCell>
                 <TableCell><Badge className={`text-[10px] ${STATUS_COLORS[lead.status]}`}>{STATUS_LABELS[lead.status]}</Badge></TableCell>
-                <TableCell><span className="text-xs">{lead.responsavel}</span></TableCell>
+                <TableCell><span className="text-xs text-muted-foreground">{getLastAuthor(lead)}</span></TableCell>
                 <TableCell><span className="text-xs text-muted-foreground">{lead.proximaAcao}</span></TableCell>
                 <TableCell onClick={e => e.stopPropagation()}>
                   <DropdownMenu>

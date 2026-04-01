@@ -45,6 +45,7 @@ export interface LeadInteraction {
   date: string;
   type: string;
   note: string;
+  author?: string;
 }
 
 export interface Lead {
