@@ -65,6 +65,8 @@ export interface Lead {
   descricao: string;
   motivoRecorrencia: string;
   historico: LeadInteraction[];
+  lat?: number;
+  lng?: number;
 }
 
 export const STATUS_LABELS: Record<LeadStatus, string> = {
@@ -117,180 +119,108 @@ export const BAIRROS: Bairro[] = [
   "Universitário", "Outras",
 ];
 
+// Coordenadas aproximadas dos bairros de Campo Grande
+export const BAIRRO_COORDS: Record<Bairro, [number, number]> = {
+  "Centro": [-20.4697, -54.6201],
+  "Jardim dos Estados": [-20.4580, -54.6150],
+  "Chácara Cachoeira": [-20.4520, -54.6050],
+  "Santa Fé": [-20.4800, -54.6350],
+  "Aero Rancho": [-20.5000, -54.6500],
+  "Vila Alba": [-20.4750, -54.5950],
+  "Vila Nasser": [-20.4850, -54.6100],
+  "Coronel Antonino": [-20.4650, -54.6400],
+  "Universitário": [-20.5050, -54.6150],
+  "Outras": [-20.4900, -54.5800],
+};
+
 export const RESPONSAVEIS = ["Carlos", "Ana", "Rafael", "Juliana", "Pedro"];
 
+function lead(id: string, empresa: string, segmento: Nicho, bairro: Bairro, telefone: string, instagram: string, potencial: LeadPotential, descricao: string, motivoRecorrencia: string): Lead {
+  const base = BAIRRO_COORDS[bairro];
+  return {
+    id, empresa, segmento, bairro, telefone, instagram, potencial,
+    temperatura: "frio", status: "novo", ultimoContato: "", proximaAcao: "",
+    responsavel: "", observacoes: "", descricao, motivoRecorrencia,
+    historico: [],
+    lat: base[0] + (Math.random() - 0.5) * 0.012,
+    lng: base[1] + (Math.random() - 0.5) * 0.012,
+  };
+}
+
 const MOCK_LEADS: Lead[] = [
-  {
-    id: "1", empresa: "Estética Bella Donna", segmento: "Clínica de Estética", bairro: "Jardim dos Estados",
-    telefone: "(67) 99901-1234", instagram: "@belladonna.cg", potencial: "premium", temperatura: "quente",
-    status: "reuniao_agendada", ultimoContato: "2026-03-30", proximaAcao: "Reunião dia 02/04",
-    responsavel: "Carlos", observacoes: "Já trabalha com pacotes, quer automatizar",
-    descricao: "Clínica premium de harmonização facial e tratamentos estéticos avançados.",
-    motivoRecorrencia: "Alta frequência de retorno dos pacientes para manutenção. Ticket médio R$800+.",
-    historico: [
-      { date: "2026-03-28", type: "WhatsApp", note: "Primeiro contato, demonstrou interesse" },
-      { date: "2026-03-30", type: "Ligação", note: "Agendada reunião presencial" },
-    ],
-  },
-  {
-    id: "2", empresa: "PetLove CG", segmento: "Pet Shop", bairro: "Chácara Cachoeira",
-    telefone: "(67) 99802-5678", instagram: "@petlovecg", potencial: "alto", temperatura: "morno",
-    status: "primeiro_contato", ultimoContato: "2026-03-29", proximaAcao: "Enviar proposta de plano mensal",
-    responsavel: "Ana", observacoes: "Tem 400+ clientes fixos de banho e tosa",
-    descricao: "Pet shop completo com banho, tosa, veterinário e venda de rações premium.",
-    motivoRecorrencia: "Clientes já retornam mensalmente. Plano de assinatura aumentaria retenção em 60%.",
-    historico: [
-      { date: "2026-03-29", type: "Instagram", note: "Contato via DM, pediu mais informações" },
-    ],
-  },
-  {
-    id: "3", empresa: "Odonto Premium", segmento: "Odontologia", bairro: "Centro",
-    telefone: "(67) 99703-9012", instagram: "@odontopremium", potencial: "premium", temperatura: "quente",
-    status: "proposta_enviada", ultimoContato: "2026-03-31", proximaAcao: "Follow-up da proposta",
-    responsavel: "Carlos", observacoes: "3 unidades em CG, quer plano de manutenção",
-    descricao: "Rede de clínicas odontológicas com foco em implantes e ortodontia.",
-    motivoRecorrencia: "Pacientes precisam de manutenções semestrais. Plano preventivo gera receita previsível.",
-    historico: [
-      { date: "2026-03-25", type: "Ligação", note: "Apresentação inicial" },
-      { date: "2026-03-28", type: "Reunião", note: "Reunião com o sócio" },
-      { date: "2026-03-31", type: "Email", note: "Proposta enviada - R$2.500/mês" },
-    ],
-  },
-  {
-    id: "4", empresa: "Studio Fitness Pro", segmento: "Academia", bairro: "Santa Fé",
-    telefone: "(67) 99604-3456", instagram: "@studiofitpro", potencial: "alto", temperatura: "morno",
-    status: "em_conversa", ultimoContato: "2026-03-28", proximaAcao: "Agendar visita presencial",
-    responsavel: "Rafael", observacoes: "200 alunos, plano mensal básico, quer upgradar",
-    descricao: "Studio de musculação e funcional com personal trainers especializados.",
-    motivoRecorrencia: "Base de alunos recorrente. Plano trimestral/semestral aumenta retenção e ticket médio.",
-    historico: [
-      { date: "2026-03-26", type: "WhatsApp", note: "Interesse em plano fidelidade" },
-      { date: "2026-03-28", type: "WhatsApp", note: "Pediu exemplos de outros studios" },
-    ],
-  },
-  {
-    id: "5", empresa: "Auto Shine Detailing", segmento: "Automotivo", bairro: "Vila Nasser",
-    telefone: "(67) 99505-7890", instagram: "@autoshinecg", potencial: "alto", temperatura: "frio",
-    status: "novo", ultimoContato: "", proximaAcao: "Primeiro contato via WhatsApp",
-    responsavel: "Ana", observacoes: "Estética automotiva premium, potencial para plano mensal",
-    descricao: "Detailing automotivo premium com serviços de polimento, vitrificação e higienização.",
-    motivoRecorrencia: "Clientes de alto padrão que fazem manutenção mensal. Plano recorrente natural.",
-    historico: [],
-  },
-  {
-    id: "6", empresa: "Nutri Vida", segmento: "Nutrição", bairro: "Universitário",
-    telefone: "(67) 99406-1122", instagram: "@nutrivida.cg", potencial: "medio", temperatura: "morno",
-    status: "primeiro_contato", ultimoContato: "2026-03-27", proximaAcao: "Enviar case de sucesso",
-    responsavel: "Juliana", observacoes: "Nutricionista com 150 pacientes ativos",
-    descricao: "Consultório de nutrição com acompanhamento mensal e planos alimentares personalizados.",
-    motivoRecorrencia: "Pacientes já fazem acompanhamento mensal. Estruturar plano recorrente é natural.",
-    historico: [
-      { date: "2026-03-27", type: "WhatsApp", note: "Enviado material sobre recorrência" },
-    ],
-  },
-  {
-    id: "7", empresa: "ContaFácil", segmento: "Contabilidade", bairro: "Centro",
-    telefone: "(67) 99307-3344", instagram: "@contafacil.cg", potencial: "medio", temperatura: "frio",
-    status: "sem_contato", ultimoContato: "", proximaAcao: "Prospectar via LinkedIn",
-    responsavel: "Pedro", observacoes: "Escritório com 80 clientes, potencial B2B",
-    descricao: "Escritório de contabilidade focado em PMEs e MEIs.",
-    motivoRecorrencia: "Já opera com contratos recorrentes. Pode expandir serviços adicionais.",
-    historico: [],
-  },
-  {
-    id: "8", empresa: "Psi Mente", segmento: "Psicologia", bairro: "Jardim dos Estados",
-    telefone: "(67) 99208-5566", instagram: "@psimente.cg", potencial: "alto", temperatura: "quente",
-    status: "em_negociacao", ultimoContato: "2026-03-31", proximaAcao: "Fechar contrato",
-    responsavel: "Juliana", observacoes: "3 psicólogos, querem plano de sessões mensais",
-    descricao: "Clínica de psicologia com atendimento presencial e online.",
-    motivoRecorrencia: "Terapia é naturalmente recorrente. Plano mensal facilita adesão e reduz no-show.",
-    historico: [
-      { date: "2026-03-20", type: "Ligação", note: "Primeiro contato" },
-      { date: "2026-03-25", type: "Reunião", note: "Apresentação completa" },
-      { date: "2026-03-31", type: "WhatsApp", note: "Negociando valores finais" },
-    ],
-  },
-  {
-    id: "9", empresa: "Lava Jato Premium CG", segmento: "Automotivo", bairro: "Aero Rancho",
-    telefone: "(67) 99109-7788", instagram: "@lavajatopremium", potencial: "alto", temperatura: "morno",
-    status: "em_conversa", ultimoContato: "2026-03-30", proximaAcao: "Apresentar modelo de assinatura",
-    responsavel: "Rafael", observacoes: "Lava-rápido premium com 300 clientes/mês",
-    descricao: "Lava-rápido premium com serviços de lavagem completa e estética automotiva.",
-    motivoRecorrencia: "Volume alto de clientes frequentes. Plano mensal garante fidelização e caixa previsível.",
-    historico: [
-      { date: "2026-03-28", type: "Visita", note: "Visita ao local, bom potencial" },
-      { date: "2026-03-30", type: "WhatsApp", note: "Interessado no modelo" },
-    ],
-  },
-  {
-    id: "10", empresa: "Beleza & Arte Salon", segmento: "Salão de Beleza", bairro: "Vila Alba",
-    telefone: "(67) 99010-9900", instagram: "@belezaarte.cg", potencial: "medio", temperatura: "frio",
-    status: "novo", ultimoContato: "", proximaAcao: "Primeiro contato",
-    responsavel: "Ana", observacoes: "Salão grande, bairro com potencial",
-    descricao: "Salão de beleza completo com cabelo, unha, maquiagem e depilação.",
-    motivoRecorrencia: "Clientes fiéis retornam mensalmente. Plano fidelidade aumenta retenção.",
-    historico: [],
-  },
-  {
-    id: "11", empresa: "Fisio Integral", segmento: "Fisioterapia", bairro: "Coronel Antonino",
-    telefone: "(67) 98911-1100", instagram: "@fisiointegral", potencial: "alto", temperatura: "quente",
-    status: "proposta_enviada", ultimoContato: "2026-03-31", proximaAcao: "Aguardando retorno",
-    responsavel: "Carlos", observacoes: "Clínica com 5 fisioterapeutas, quer pacotes",
-    descricao: "Clínica de fisioterapia e reabilitação com tratamentos contínuos.",
-    motivoRecorrencia: "Pacientes precisam de sessões contínuas por semanas/meses. Pacote recorrente é natural.",
-    historico: [
-      { date: "2026-03-27", type: "Reunião", note: "Apresentação do modelo" },
-      { date: "2026-03-31", type: "Email", note: "Proposta enviada" },
-    ],
-  },
-  {
-    id: "12", empresa: "CleanPro Serviços", segmento: "Limpeza Empresarial", bairro: "Centro",
-    telefone: "(67) 98812-2200", instagram: "@cleanpro.cg", potencial: "premium", temperatura: "morno",
-    status: "reuniao_agendada", ultimoContato: "2026-03-30", proximaAcao: "Reunião dia 03/04",
-    responsavel: "Pedro", observacoes: "Atende 15 empresas, quer escalar com recorrência",
-    descricao: "Empresa de limpeza e conservação predial para escritórios e comércios.",
-    motivoRecorrencia: "Serviço naturalmente recorrente. Contratos mensais são o padrão do setor.",
-    historico: [
-      { date: "2026-03-28", type: "Ligação", note: "Contato inicial positivo" },
-      { date: "2026-03-30", type: "WhatsApp", note: "Reunião confirmada" },
-    ],
-  },
-  {
-    id: "13", empresa: "Smart Cowork", segmento: "Coworking", bairro: "Chácara Cachoeira",
-    telefone: "(67) 98713-3300", instagram: "@smartcowork", potencial: "medio", temperatura: "frio",
-    status: "sem_contato", ultimoContato: "", proximaAcao: "Pesquisar mais sobre o negócio",
-    responsavel: "Rafael", observacoes: "Coworking novo, potencial de planos",
-    descricao: "Espaço de coworking com salas de reunião e escritórios privativos.",
-    motivoRecorrencia: "Modelo já é recorrente. Pode agregar serviços extras por assinatura.",
-    historico: [],
-  },
-  {
-    id: "14", empresa: "Clínica Derma Plus", segmento: "Clínica de Saúde", bairro: "Jardim dos Estados",
-    telefone: "(67) 98614-4400", instagram: "@dermaplus.cg", potencial: "premium", temperatura: "quente",
-    status: "em_conversa", ultimoContato: "2026-03-31", proximaAcao: "Enviar proposta personalizada",
-    responsavel: "Juliana", observacoes: "Dermatologia + estética, ticket alto",
-    descricao: "Clínica de dermatologia com tratamentos estéticos de alta tecnologia.",
-    motivoRecorrencia: "Tratamentos requerem múltiplas sessões e manutenção. LTV altíssimo.",
-    historico: [
-      { date: "2026-03-29", type: "Reunião", note: "Reunião com a dra. proprietária" },
-      { date: "2026-03-31", type: "WhatsApp", note: "Pediu proposta detalhada" },
-    ],
-  },
-  {
-    id: "15", empresa: "English Now CG", segmento: "Educação", bairro: "Universitário",
-    telefone: "(67) 98515-5500", instagram: "@englishnowcg", potencial: "medio", temperatura: "morno",
-    status: "primeiro_contato", ultimoContato: "2026-03-29", proximaAcao: "Agendar call",
-    responsavel: "Pedro", observacoes: "Escola de idiomas, 120 alunos",
-    descricao: "Escola de inglês e espanhol com turmas presenciais e online.",
-    motivoRecorrencia: "Mensalidades já são recorrentes. Estruturar melhor reduz evasão.",
-    historico: [
-      { date: "2026-03-29", type: "Email", note: "Primeiro contato por email" },
-    ],
-  },
+  // CENTRO
+  lead("1", "Odonto Premium", "Odontologia", "Centro", "(67) 99703-9012", "@odontopremium", "premium", "Rede de clínicas odontológicas com foco em implantes e ortodontia.", "Pacientes precisam de manutenções semestrais."),
+  lead("2", "ContaFácil", "Contabilidade", "Centro", "(67) 99307-3344", "@contafacil.cg", "medio", "Escritório de contabilidade focado em PMEs e MEIs.", "Já opera com contratos recorrentes."),
+  lead("3", "CleanPro Serviços", "Limpeza Empresarial", "Centro", "(67) 98812-2200", "@cleanpro.cg", "premium", "Limpeza e conservação predial para escritórios.", "Contratos mensais são o padrão do setor."),
+  lead("4", "Sorriso Perfeito", "Odontologia", "Centro", "(67) 99111-2233", "@sorrisoperfeito", "alto", "Clínica de ortodontia e clareamento dental.", "Tratamentos longos geram recorrência natural."),
+  lead("5", "Espaço Zen Yoga", "Academia", "Centro", "(67) 99222-3344", "@espacozen.cg", "medio", "Studio de yoga e pilates no centro.", "Alunos mensalistas, alta fidelização."),
+  lead("6", "Barber King CG", "Salão de Beleza", "Centro", "(67) 99333-4455", "@barberking.cg", "medio", "Barbearia premium masculina.", "Clientes voltam a cada 15-20 dias."),
+  lead("7", "Tech Solutions CG", "Serviços B2B", "Centro", "(67) 99444-5566", "@techsolutions.cg", "alto", "Suporte de TI para empresas.", "Contratos mensais de suporte."),
+
+  // JARDIM DOS ESTADOS
+  lead("8", "Estética Bella Donna", "Clínica de Estética", "Jardim dos Estados", "(67) 99901-1234", "@belladonna.cg", "premium", "Clínica premium de harmonização facial.", "Alta frequência de retorno. Ticket médio R$800+."),
+  lead("9", "Psi Mente", "Psicologia", "Jardim dos Estados", "(67) 99208-5566", "@psimente.cg", "alto", "Clínica de psicologia presencial e online.", "Terapia é naturalmente recorrente."),
+  lead("10", "Clínica Derma Plus", "Clínica de Saúde", "Jardim dos Estados", "(67) 98614-4400", "@dermaplus.cg", "premium", "Dermatologia com tratamentos estéticos.", "Tratamentos requerem múltiplas sessões."),
+  lead("11", "Spa & Soul", "Clínica de Estética", "Jardim dos Estados", "(67) 99555-6677", "@spaesoul.cg", "alto", "Day spa com tratamentos corporais.", "Pacotes mensais de relaxamento."),
+  lead("12", "Dra. Camila Nutrição", "Nutrição", "Jardim dos Estados", "(67) 99666-7788", "@dracamilanutri", "alto", "Nutricionista esportiva e funcional.", "Acompanhamento mensal contínuo."),
+  lead("13", "Instituto Cabelo & Cia", "Salão de Beleza", "Jardim dos Estados", "(67) 99777-8899", "@cabeloecia.cg", "medio", "Salão premium feminino.", "Clientes fiéis com visitas quinzenais."),
+
+  // CHÁCARA CACHOEIRA
+  lead("14", "PetLove CG", "Pet Shop", "Chácara Cachoeira", "(67) 99802-5678", "@petlovecg", "alto", "Pet shop completo com banho, tosa e vet.", "400+ clientes fixos de banho e tosa."),
+  lead("15", "Smart Cowork", "Coworking", "Chácara Cachoeira", "(67) 98713-3300", "@smartcowork", "medio", "Coworking com salas de reunião.", "Modelo já é recorrente."),
+  lead("16", "CrossFit CG Box", "Academia", "Chácara Cachoeira", "(67) 99888-9900", "@crossfitcg", "alto", "Box de CrossFit com 180 atletas.", "Mensalidades recorrentes, comunidade forte."),
+  lead("17", "Vet Life CG", "Pet Shop", "Chácara Cachoeira", "(67) 99999-0011", "@vetlife.cg", "alto", "Clínica veterinária 24h.", "Plano de saúde pet é tendência."),
+  lead("18", "Espaço Maker CG", "Coworking", "Chácara Cachoeira", "(67) 98100-1122", "@espacomaker", "medio", "Coworking criativo e eventos.", "Planos mensais de uso."),
+
+  // SANTA FÉ
+  lead("19", "Studio Fitness Pro", "Academia", "Santa Fé", "(67) 99604-3456", "@studiofitpro", "alto", "Studio de musculação e funcional.", "200 alunos, plano mensal."),
+  lead("20", "Pet Center Santa Fé", "Pet Shop", "Santa Fé", "(67) 98200-2233", "@petcentersf", "medio", "Pet shop de bairro com banho e tosa.", "Clientes mensais fiéis."),
+  lead("21", "Estética Natural", "Clínica de Estética", "Santa Fé", "(67) 98300-3344", "@esteticanatural.cg", "alto", "Tratamentos estéticos naturais e orgânicos.", "Pacotes de tratamento contínuo."),
+  lead("22", "Auto Center SF", "Automotivo", "Santa Fé", "(67) 98400-4455", "@autocentersf", "medio", "Oficina mecânica e troca de óleo.", "Manutenção preventiva recorrente."),
+  lead("23", "Escola Futuro Brilhante", "Educação", "Santa Fé", "(67) 98500-5566", "@futurobrilhante", "medio", "Reforço escolar e cursos.", "Mensalidades recorrentes."),
+
+  // AERO RANCHO
+  lead("24", "Lava Jato Premium CG", "Automotivo", "Aero Rancho", "(67) 99109-7788", "@lavajatopremium", "alto", "Lava-rápido premium com estética automotiva.", "300 clientes/mês, potencial para plano."),
+  lead("25", "Salão da Rê", "Salão de Beleza", "Aero Rancho", "(67) 98600-6677", "@salaodarecg", "medio", "Salão popular com grande volume.", "Alto fluxo de clientes recorrentes."),
+  lead("26", "Gym Power", "Academia", "Aero Rancho", "(67) 98700-7788", "@gympower.cg", "alto", "Academia grande com 500+ alunos.", "Base enorme para fidelização."),
+  lead("27", "PetBanho AR", "Pet Shop", "Aero Rancho", "(67) 98800-8899", "@petbanhoar", "medio", "Banho e tosa delivery.", "Serviço recorrente por natureza."),
+  lead("28", "Mecânica do Povo", "Automotivo", "Aero Rancho", "(67) 98900-9900", "@mecanicadopovo", "baixo", "Oficina popular com grande fluxo.", "Revisão periódica gera recorrência."),
+
+  // VILA ALBA
+  lead("29", "Beleza & Arte Salon", "Salão de Beleza", "Vila Alba", "(67) 99010-9900", "@belezaarte.cg", "medio", "Salão completo com cabelo, unha e maquiagem.", "Clientes fiéis retornam mensalmente."),
+  lead("30", "Fisio Move", "Fisioterapia", "Vila Alba", "(67) 97100-1122", "@fisiomove.cg", "alto", "Fisioterapia esportiva e ortopédica.", "Sessões contínuas por semanas/meses."),
+  lead("31", "Dente Saudável", "Odontologia", "Vila Alba", "(67) 97200-2233", "@dentesaudavel", "alto", "Odontologia preventiva familiar.", "Check-ups semestrais, plano preventivo."),
+  lead("32", "Empada da Boa", "Serviços B2B", "Vila Alba", "(67) 97300-3344", "@empadadaboa", "baixo", "Fornecimento de salgados para eventos.", "Contratos de fornecimento regular."),
+
+  // VILA NASSER
+  lead("33", "Auto Shine Detailing", "Automotivo", "Vila Nasser", "(67) 99505-7890", "@autoshinecg", "alto", "Detailing automotivo premium.", "Clientes de alto padrão, manutenção mensal."),
+  lead("34", "Clínica Vitalis", "Clínica de Saúde", "Vila Nasser", "(67) 97400-4455", "@clinicavitalis", "alto", "Clínica médica geral.", "Acompanhamento contínuo de pacientes crônicos."),
+  lead("35", "Studio Pilates VN", "Academia", "Vila Nasser", "(67) 97500-5566", "@studiopilatesvn", "medio", "Pilates e funcional para mulheres.", "Alunas mensalistas fiéis."),
+  lead("36", "Dog & Cat Pet", "Pet Shop", "Vila Nasser", "(67) 97600-6677", "@dogcatpet.cg", "medio", "Pet shop completo.", "Banho mensal recorrente."),
+
+  // CORONEL ANTONINO
+  lead("37", "Fisio Integral", "Fisioterapia", "Coronel Antonino", "(67) 98911-1100", "@fisiointegral", "alto", "Fisioterapia e reabilitação.", "Pacientes com sessões contínuas."),
+  lead("38", "Clínica Odonto Smile", "Odontologia", "Coronel Antonino", "(67) 97700-7788", "@odontosmile.cg", "alto", "Odontologia estética e implantes.", "Manutenção de implantes é recorrente."),
+  lead("39", "Clean House CG", "Limpeza Empresarial", "Coronel Antonino", "(67) 97800-8899", "@cleanhouse.cg", "medio", "Limpeza residencial e comercial.", "Serviço semanal/quinzenal recorrente."),
+  lead("40", "Espaço Terapia", "Psicologia", "Coronel Antonino", "(67) 97900-9900", "@espacoterapia", "alto", "Clínica multidisciplinar de psicologia.", "Terapia é recorrência pura."),
+
+  // UNIVERSITÁRIO
+  lead("41", "Nutri Vida", "Nutrição", "Universitário", "(67) 99406-1122", "@nutrivida.cg", "medio", "Nutrição com acompanhamento mensal.", "150 pacientes ativos mensais."),
+  lead("42", "English Now CG", "Educação", "Universitário", "(67) 98515-5500", "@englishnowcg", "medio", "Escola de inglês e espanhol.", "120 alunos mensalistas."),
+  lead("43", "Academia Flex", "Academia", "Universitário", "(67) 96100-1122", "@academiaflex.cg", "alto", "Academia perto da UFMS.", "Alta rotação de alunos, fidelização é chave."),
+  lead("44", "Copy & Print Uni", "Serviços B2B", "Universitário", "(67) 96200-2233", "@copyprintuni", "baixo", "Gráfica rápida universitária.", "Planos mensais para empresas."),
+  lead("45", "Barbearia Corte Certo", "Salão de Beleza", "Universitário", "(67) 96300-3344", "@cortecerto.cg", "medio", "Barbearia moderna universitária.", "Clientes a cada 15 dias."),
+
+  // OUTRAS
+  lead("46", "Fazenda Fit", "Academia", "Outras", "(67) 96400-4455", "@fazendafit.cg", "alto", "Academia rural premium na saída para Sidrolândia.", "Público fiel, pouca concorrência."),
+  lead("47", "Clínica VetMais", "Pet Shop", "Outras", "(67) 96500-5566", "@vetmais.cg", "alto", "Clínica vet na região do Noroeste.", "Plano de saúde pet é mercado virgem."),
+  lead("48", "Solar Clean Energy", "Serviços B2B", "Outras", "(67) 96600-6677", "@solarclean.cg", "premium", "Manutenção de painéis solares.", "Assinatura de manutenção preventiva."),
+  lead("49", "Estética Corpo & Alma", "Clínica de Estética", "Outras", "(67) 96700-7788", "@corpoealma.cg", "alto", "Estética corporal e facial.", "Tratamentos requerem múltiplas sessões."),
+  lead("50", "Limpeza Total MS", "Limpeza Empresarial", "Outras", "(67) 96800-8899", "@limpezatotal.ms", "alto", "Limpeza industrial e comercial.", "Contratos mensais de grande porte."),
 ];
 
 export function getInitialLeads(): Lead[] {
-  const stored = localStorage.getItem("crm_leads");
+  const stored = localStorage.getItem("crm_leads_v2");
   if (stored) {
     try { return JSON.parse(stored); } catch { /* fall through */ }
   }
@@ -298,42 +228,47 @@ export function getInitialLeads(): Lead[] {
 }
 
 export function saveLeads(leads: Lead[]) {
-  localStorage.setItem("crm_leads", JSON.stringify(leads));
+  localStorage.setItem("crm_leads_v2", JSON.stringify(leads));
+}
+
+// ===== ACTIVITY LOG =====
+export interface ActivityLogEntry {
+  id: string;
+  timestamp: string;
+  action: string;
+  leadEmpresa: string;
+  leadId: string;
+  author: string;
+  details: string;
+}
+
+export function getActivityLog(): ActivityLogEntry[] {
+  const stored = localStorage.getItem("crm_activity_log");
+  if (stored) {
+    try { return JSON.parse(stored); } catch { /* fall through */ }
+  }
+  return [];
+}
+
+export function addActivityLog(entry: Omit<ActivityLogEntry, "id" | "timestamp">) {
+  const log = getActivityLog();
+  log.unshift({
+    ...entry,
+    id: Date.now().toString(),
+    timestamp: new Date().toISOString(),
+  });
+  localStorage.setItem("crm_activity_log", JSON.stringify(log.slice(0, 500)));
 }
 
 export const SALES_ARGUMENTS = [
-  {
-    title: "Previsibilidade de receita",
-    text: "Em vez de depender de vendas pontuais, seu cliente sabe exatamente quanto entra todo mês. Use: 'Imagine saber no dia 1º quanto vai faturar no mês inteiro.'",
-  },
-  {
-    title: "Redução de inadimplência",
-    text: "Cobrança automática no cartão reduz inadimplência de 20-30% para menos de 5%. Use: 'Chega de ficar cobrando cliente por cliente.'",
-  },
-  {
-    title: "Retenção de clientes",
-    text: "Cliente recorrente fica 3x mais tempo que cliente avulso. Use: 'Seu cliente já volta todo mês — por que não garantir isso no contrato?'",
-  },
-  {
-    title: "Aumento de LTV",
-    text: "Cliente recorrente gasta 2.5x mais ao longo do tempo. Use: 'Um cliente de R$200/mês vale R$2.400/ano garantidos.'",
-  },
-  {
-    title: "Profissionalização da operação",
-    text: "Sistema de recorrência organiza agenda, pagamento e relacionamento. Use: 'Sair da planilha e do caderninho muda o jogo.'",
-  },
-  {
-    title: "Escala sem aumentar equipe",
-    text: "Automatizando cobrança e gestão, cresce sem contratar. Use: 'Você pode dobrar os clientes sem dobrar a dor de cabeça.'",
-  },
-  {
-    title: "Valuation do negócio",
-    text: "Negócio com receita recorrente vale 3-5x mais na venda. Use: 'Se um dia quiser vender, recorrência é o que mais valoriza.'",
-  },
-  {
-    title: "Previsibilidade de caixa",
-    text: "Permite planejar investimentos, contratar e crescer com segurança. Use: 'Parar de apagar incêndio e começar a planejar crescimento.'",
-  },
+  { title: "Previsibilidade de receita", text: "Em vez de depender de vendas pontuais, seu cliente sabe exatamente quanto entra todo mês. Use: 'Imagine saber no dia 1º quanto vai faturar no mês inteiro.'" },
+  { title: "Redução de inadimplência", text: "Cobrança automática no cartão reduz inadimplência de 20-30% para menos de 5%. Use: 'Chega de ficar cobrando cliente por cliente.'" },
+  { title: "Retenção de clientes", text: "Cliente recorrente fica 3x mais tempo que cliente avulso. Use: 'Seu cliente já volta todo mês — por que não garantir isso no contrato?'" },
+  { title: "Aumento de LTV", text: "Cliente recorrente gasta 2.5x mais ao longo do tempo. Use: 'Um cliente de R$200/mês vale R$2.400/ano garantidos.'" },
+  { title: "Profissionalização da operação", text: "Sistema de recorrência organiza agenda, pagamento e relacionamento. Use: 'Sair da planilha e do caderninho muda o jogo.'" },
+  { title: "Escala sem aumentar equipe", text: "Automatizando cobrança e gestão, cresce sem contratar. Use: 'Você pode dobrar os clientes sem dobrar a dor de cabeça.'" },
+  { title: "Valuation do negócio", text: "Negócio com receita recorrente vale 3-5x mais na venda. Use: 'Se um dia quiser vender, recorrência é o que mais valoriza.'" },
+  { title: "Previsibilidade de caixa", text: "Permite planejar investimentos, contratar e crescer com segurança. Use: 'Parar de apagar incêndio e começar a planejar crescimento.'" },
 ];
 
 export const SCRIPTS = {
