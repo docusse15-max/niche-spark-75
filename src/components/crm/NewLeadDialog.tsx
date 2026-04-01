@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { NICHOS, BAIRROS, Lead } from "@/data/leads";
+import { NICHOS, Lead } from "@/data/leads";
+import { CIDADES, CIDADE_CONFIGS, type Cidade } from "@/data/cities";
 import { useState } from "react";
 
 interface NewLeadDialogProps {
@@ -15,34 +16,41 @@ interface NewLeadDialogProps {
 
 export default function NewLeadDialog({ open, onClose, onSave }: NewLeadDialogProps) {
   const [form, setForm] = useState({
-    empresa: "", segmento: "" as any, bairro: "" as any, telefone: "", instagram: "",
+    empresa: "", segmento: "" as any, cidade: "" as Cidade | "", bairro: "", telefone: "", instagram: "",
     potencial: "medio" as any, observacoes: "",
   });
 
   const set = (key: string, val: string) => setForm(f => ({ ...f, [key]: val }));
 
+  const bairrosForCity = form.cidade ? CIDADE_CONFIGS[form.cidade as Cidade]?.bairros || [] : [];
+
   const handleSave = () => {
-    if (!form.empresa || !form.segmento || !form.bairro) return;
+    if (!form.empresa || !form.segmento || !form.cidade || !form.bairro) return;
+    const cidade = form.cidade as Cidade;
+    const bairroObj = CIDADE_CONFIGS[cidade]?.bairros.find(b => b.nome === form.bairro);
     const lead: Lead = {
       id: Date.now().toString(),
       empresa: form.empresa,
       segmento: form.segmento,
       bairro: form.bairro,
+      cidade,
       telefone: form.telefone,
       instagram: form.instagram,
       potencial: form.potencial,
       temperatura: "frio",
       status: "novo",
       ultimoContato: "",
-      proximaAcao: "Primeiro contato",
+      proximaAcao: "",
       responsavel: "",
       observacoes: form.observacoes,
       descricao: "",
       motivoRecorrencia: "",
       historico: [],
+      lat: bairroObj ? bairroObj.coords[0] + (Math.random() - 0.5) * 0.01 : undefined,
+      lng: bairroObj ? bairroObj.coords[1] + (Math.random() - 0.5) * 0.01 : undefined,
     };
     onSave(lead);
-    setForm({ empresa: "", segmento: "" as any, bairro: "" as any, telefone: "", instagram: "", potencial: "medio", observacoes: "" });
+    setForm({ empresa: "", segmento: "" as any, cidade: "", bairro: "", telefone: "", instagram: "", potencial: "medio", observacoes: "" });
     onClose();
   };
 
@@ -56,23 +64,27 @@ export default function NewLeadDialog({ open, onClose, onSave }: NewLeadDialogPr
             <div><Label className="text-xs">Segmento *</Label>
               <Select value={form.segmento || undefined} onValueChange={v => set("segmento", v)}><SelectTrigger className="h-9"><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{NICHOS.map(n => <SelectItem key={n} value={n}>{n}</SelectItem>)}</SelectContent></Select>
             </div>
+            <div><Label className="text-xs">Cidade *</Label>
+              <Select value={form.cidade || undefined} onValueChange={v => { set("cidade", v); set("bairro", ""); }}><SelectTrigger className="h-9"><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{CIDADES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
             <div><Label className="text-xs">Bairro *</Label>
-              <Select value={form.bairro || undefined} onValueChange={v => set("bairro", v)}><SelectTrigger className="h-9"><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{BAIRROS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent></Select>
+              <Select value={form.bairro || undefined} onValueChange={v => set("bairro", v)} disabled={!form.cidade}><SelectTrigger className="h-9"><SelectValue placeholder={form.cidade ? "Selecione" : "Escolha cidade"} /></SelectTrigger><SelectContent>{bairrosForCity.map(b => <SelectItem key={b.nome} value={b.nome}>{b.nome}</SelectItem>)}</SelectContent></Select>
+            </div>
+            <div><Label className="text-xs">Potencial</Label>
+              <Select value={form.potencial} onValueChange={v => set("potencial", v)}><SelectTrigger className="h-9"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="baixo">Baixo</SelectItem><SelectItem value="medio">Médio</SelectItem><SelectItem value="alto">Alto</SelectItem><SelectItem value="premium">Premium</SelectItem></SelectContent></Select>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div><Label className="text-xs">Telefone</Label><Input value={form.telefone} onChange={e => set("telefone", e.target.value)} placeholder="(67) 99999-0000" className="h-9" /></div>
             <div><Label className="text-xs">Instagram</Label><Input value={form.instagram} onChange={e => set("instagram", e.target.value)} placeholder="@perfil" className="h-9" /></div>
           </div>
-          <div>
-            <Label className="text-xs">Potencial</Label>
-            <Select value={form.potencial} onValueChange={v => set("potencial", v)}><SelectTrigger className="h-9"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="baixo">Baixo</SelectItem><SelectItem value="medio">Médio</SelectItem><SelectItem value="alto">Alto</SelectItem><SelectItem value="premium">Premium</SelectItem></SelectContent></Select>
-          </div>
           <div><Label className="text-xs">Observações</Label><Textarea value={form.observacoes} onChange={e => set("observacoes", e.target.value)} placeholder="Notas iniciais..." rows={2} className="text-sm" /></div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancelar</Button>
-          <Button onClick={handleSave} disabled={!form.empresa || !form.segmento || !form.bairro}>Salvar Lead</Button>
+          <Button onClick={handleSave} disabled={!form.empresa || !form.segmento || !form.cidade || !form.bairro}>Salvar Lead</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

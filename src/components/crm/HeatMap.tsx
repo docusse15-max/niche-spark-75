@@ -1,5 +1,9 @@
-import { Lead, BAIRROS } from "@/data/leads";
-import { cn } from "@/lib/utils";
+import { useEffect, useRef, useMemo } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { Lead } from "@/data/leads";
+import { CIDADES } from "@/data/cities";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface HeatMapProps {
   leads: Lead[];
@@ -9,96 +13,131 @@ interface HeatMapProps {
   onSelectLeadOnMap: (lead: Lead) => void;
 }
 
-const MAP_BOUNDS = {
-  minLat: -20.53,
-  maxLat: -20.42,
-  minLng: -54.69,
-  maxLng: -54.56,
-};
-
-function projectLeadToMap(lat: number, lng: number) {
-  const x = ((lng - MAP_BOUNDS.minLng) / (MAP_BOUNDS.maxLng - MAP_BOUNDS.minLng)) * 100;
-  const y = (1 - (lat - MAP_BOUNDS.minLat) / (MAP_BOUNDS.maxLat - MAP_BOUNDS.minLat)) * 100;
-  return {
-    x: Math.max(2, Math.min(98, x)),
-    y: Math.max(2, Math.min(98, y)),
-  };
-}
-
 export default function HeatMap({ leads, selectedBairro, onSelectBairro, selectedLeadId, onSelectLeadOnMap }: HeatMapProps) {
-  const counts = BAIRROS.reduce((acc, b) => {
-    acc[b] = leads.filter((l) => l.bairro === b).length;
-    return acc;
-  }, {} as Record<string, number>);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstance = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.LayerGroup | null>(null);
+  const selectedCityRef = useRef<string>("all");
 
-  const max = Math.max(...Object.values(counts), 1);
+  const visibleLeads = useMemo(() => {
+    return selectedBairro ? leads.filter(l => l.bairro === selectedBairro) : leads;
+  }, [leads, selectedBairro]);
 
-  const getIntensity = (count: number) => {
-    const ratio = count / max;
-    if (ratio === 0) return "bg-secondary text-muted-foreground hover:bg-secondary/80";
-    if (ratio < 0.3) return "bg-primary/15 text-primary hover:bg-primary/25";
-    if (ratio < 0.6) return "bg-primary/30 text-primary hover:bg-primary/40";
-    return "bg-primary/50 text-primary-foreground hover:bg-primary/60";
+  // Initialize map
+  useEffect(() => {
+    if (!mapRef.current || mapInstance.current) return;
+
+    const map = L.map(mapRef.current, {
+      center: [-21.5, -55.5],
+      zoom: 7,
+      zoomControl: true,
+      scrollWheelZoom: true,
+    });
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '© OpenStreetMap',
+      maxZoom: 18,
+    }).addTo(map);
+
+    markersRef.current = L.layerGroup().addTo(map);
+    mapInstance.current = map;
+
+    return () => {
+      map.remove();
+      mapInstance.current = null;
+    };
+  }, []);
+
+  // Update markers
+  useEffect(() => {
+    if (!mapInstance.current || !markersRef.current) return;
+    markersRef.current.clearLayers();
+
+    visibleLeads.forEach(lead => {
+      if (!lead.lat || !lead.lng) return;
+      
+      const isSelected = selectedLeadId === lead.id;
+      const color = isSelected ? "#D4AF37" : "#8B6914";
+      const radius = isSelected ? 10 : 6;
+      const fillOpacity = isSelected ? 1 : 0.7;
+
+      const marker = L.circleMarker([lead.lat, lead.lng], {
+        radius,
+        fillColor: color,
+        color: isSelected ? "#FFD700" : "#5a4510",
+        weight: isSelected ? 3 : 1,
+        fillOpacity,
+      });
+
+      marker.bindTooltip(`<strong>${lead.empresa}</strong><br/>${lead.segmento}<br/>${lead.bairro} - ${lead.cidade}`, {
+        direction: "top",
+        offset: [0, -8],
+      });
+
+      marker.on("click", () => {
+        onSelectLeadOnMap(lead);
+      });
+
+      marker.addTo(markersRef.current!);
+    });
+  }, [visibleLeads, selectedLeadId, onSelectLeadOnMap]);
+
+  // Fly to selected lead
+  useEffect(() => {
+    if (!mapInstance.current || !selectedLeadId) return;
+    const lead = leads.find(l => l.id === selectedLeadId);
+    if (lead?.lat && lead?.lng) {
+      mapInstance.current.flyTo([lead.lat, lead.lng], 14, { duration: 0.8 });
+    }
+  }, [selectedLeadId, leads]);
+
+  const handleCityFilter = (city: string) => {
+    selectedCityRef.current = city;
+    if (city === "all") {
+      mapInstance.current?.flyTo([-21.5, -55.5], 7, { duration: 0.8 });
+    } else {
+      const cityLeads = leads.filter(l => l.cidade === city);
+      if (cityLeads.length > 0) {
+        const bounds = L.latLngBounds(cityLeads.filter(l => l.lat && l.lng).map(l => [l.lat!, l.lng!]));
+        mapInstance.current?.flyToBounds(bounds, { padding: [30, 30], duration: 0.8 });
+      }
+    }
+    onSelectBairro("");
   };
 
-  const visibleLeads = selectedBairro ? leads.filter((l) => l.bairro === selectedBairro) : leads;
+  // Count leads per city
+  const cityCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const c of CIDADES) counts[c] = leads.filter(l => l.cidade === c).length;
+    return counts;
+  }, [leads]);
 
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden">
-      <h3 className="font-semibold text-sm p-4 pb-2 gold-text">📍 Mapa de Leads — Campo Grande, MS</h3>
-
-      <div className="relative h-[350px]">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d58880.26662508398!2d-54.6295!3d-20.4697!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr!4v1711929600000"
-          className="w-full h-full border-0"
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          title="Mapa de Campo Grande"
-        />
-
-        <div className="absolute inset-0 pointer-events-none">
-          {visibleLeads.map((lead) => {
-            if (!lead.lat || !lead.lng) return null;
-            const { x, y } = projectLeadToMap(lead.lat, lead.lng);
-            const selected = selectedLeadId === lead.id;
-
-            return (
-              <button
-                key={lead.id}
-                type="button"
-                onClick={() => onSelectLeadOnMap(lead)}
-                className={cn(
-                  "absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 transition-all pointer-events-auto",
-                  selected
-                    ? "h-4 w-4 bg-primary border-primary-foreground ring-4 ring-primary/40"
-                    : "h-3 w-3 bg-primary/80 border-background hover:scale-125",
-                )}
-                style={{ left: `${x}%`, top: `${y}%` }}
-                title={lead.empresa}
-              />
-            );
-          })}
+      <div className="flex items-center justify-between p-4 pb-2">
+        <h3 className="font-semibold text-sm gold-text">📍 Mapa de Leads — Mato Grosso do Sul</h3>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] text-muted-foreground">{visibleLeads.length} leads visíveis</span>
+          <Select defaultValue="all" onValueChange={handleCityFilter}>
+            <SelectTrigger className="w-[150px] h-7 text-xs bg-secondary border-border">
+              <SelectValue placeholder="Cidade" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as Cidades</SelectItem>
+              {CIDADES.map(c => (
+                <SelectItem key={c} value={c}>{c} ({cityCounts[c]})</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
+      <div ref={mapRef} className="h-[400px] w-full" style={{ zIndex: 1 }} />
+
       <div className="p-3">
-        <p className="text-[10px] text-muted-foreground mb-2">Filtrar por região:</p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1.5">
-          {BAIRROS.map((b) => (
-            <button
-              key={b}
-              onClick={() => onSelectBairro(selectedBairro === b ? "" : b)}
-              className={cn(
-                "rounded-md px-2 py-1.5 text-center transition-all cursor-pointer border text-xs font-medium",
-                getIntensity(counts[b]),
-                selectedBairro === b ? "border-primary ring-1 ring-primary/40" : "border-transparent",
-              )}
-            >
-              <span>{b}</span>
-              <span className="ml-1 font-bold">({counts[b]})</span>
-            </button>
-          ))}
-        </div>
+        <p className="text-[10px] text-muted-foreground mb-1">
+          Clique nos pontos para ver detalhes do lead. Use scroll para zoom.
+        </p>
       </div>
     </div>
   );

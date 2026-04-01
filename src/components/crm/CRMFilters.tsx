@@ -1,7 +1,8 @@
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { NICHOS, BAIRROS } from "@/data/leads";
+import { NICHOS } from "@/data/leads";
+import { CIDADES } from "@/data/cities";
 import { X, Search } from "lucide-react";
 
 export interface Filters {
