@@ -214,15 +214,15 @@ function generateLeads(): Lead[] {
 
   // Leads per city: CG gets more, others get proportional
   const leadsPerCity: Record<Cidade, number> = {
-    "Campo Grande": 120,
-    "Dourados": 40,
-    "Ponta Porã": 25,
-    "Aquidauana": 20,
-    "Sidrolândia": 15,
-    "Bonito": 15,
-    "Corumbá": 30,
-    "Maracaju": 15,
-    "Rio Brilhante": 15,
+    "Campo Grande": 350,
+    "Dourados": 100,
+    "Ponta Porã": 60,
+    "Aquidauana": 40,
+    "Sidrolândia": 35,
+    "Bonito": 35,
+    "Corumbá": 80,
+    "Maracaju": 50,
+    "Rio Brilhante": 50,
   };
 
   for (const cidade of CIDADES) {
