@@ -266,7 +266,7 @@ export function getInitialLeads(): Lead[] {
 }
 
 export function saveLeads(leads: Lead[]) {
-  localStorage.setItem("crm_leads_v3", JSON.stringify(leads));
+  localStorage.setItem("crm_leads_v4", JSON.stringify(leads));
 }
 
 // ===== ACTIVITY LOG =====
