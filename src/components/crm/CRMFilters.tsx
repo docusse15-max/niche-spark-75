@@ -36,11 +36,11 @@ export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
           {NICHOS.map(n => <SelectItem key={n} value={n}>{n}</SelectItem>)}
         </SelectContent>
       </Select>
-      <Select value={filters.bairro || "all"} onValueChange={v => set("bairro", v)}>
-        <SelectTrigger className="w-[160px] h-9 bg-secondary border-border"><SelectValue placeholder="Bairro" /></SelectTrigger>
+      <Select value={filters.cidade || "all"} onValueChange={v => set("cidade", v)}>
+        <SelectTrigger className="w-[160px] h-9 bg-secondary border-border"><SelectValue placeholder="Cidade" /></SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Todos os Bairros</SelectItem>
-          {BAIRROS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+          <SelectItem value="all">Todas as Cidades</SelectItem>
+          {CIDADES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
         </SelectContent>
       </Select>
       <Select value={filters.temperatura || "all"} onValueChange={v => set("temperatura", v)}>
