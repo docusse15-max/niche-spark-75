@@ -27,11 +27,11 @@ export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input placeholder="Buscar empresa..." value={filters.search} onChange={e => set("search", e.target.value)} className="pl-8 h-9 bg-secondary border-border" />
       </div>
-      <Select value={filters.nicho || undefined} onValueChange={v => set("nicho", v)}>
+      <Select value={filters.nicho} onValueChange={v => set("nicho", v)}>
         <SelectTrigger className="w-[160px] h-9 bg-secondary border-border"><SelectValue placeholder="Nicho" /></SelectTrigger>
         <SelectContent>{NICHOS.map(n => <SelectItem key={n} value={n}>{n}</SelectItem>)}</SelectContent>
       </Select>
-      <Select value={filters.bairro || undefined} onValueChange={v => set("bairro", v)}>
+      <Select value={filters.bairro} onValueChange={v => set("bairro", v)}>
         <SelectTrigger className="w-[160px] h-9 bg-secondary border-border"><SelectValue placeholder="Bairro" /></SelectTrigger>
         <SelectContent>{BAIRROS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
       </Select>
