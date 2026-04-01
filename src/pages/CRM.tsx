@@ -146,7 +146,7 @@ export default function CRM() {
         </div>
       </div>
 
-      <LeadDetailSheet lead={selectedLead} open={sheetOpen} onClose={() => setSheetOpen(false)} onAddNote={handleAddNote} />
+      <LeadDetailSheet lead={selectedLead} open={sheetOpen} onClose={() => setSheetOpen(false)} onAddNote={handleAddNote} onDeleteLead={handleDeleteLead} />
       <NewLeadDialog open={newLeadOpen} onClose={() => setNewLeadOpen(false)} onSave={handleNewLead} />
     </div>
   );
