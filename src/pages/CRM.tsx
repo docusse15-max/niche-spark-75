@@ -66,7 +66,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
     const updated = leads.map(l => l.id === id ? { ...l, status, ultimoContato: new Date().toISOString().split("T")[0] } : l);
     persist(updated);
     if (lead) {
-      addActivityLog({ action: "status_alterado", leadEmpresa: lead.empresa, leadId: id, author: "Sistema", details: `Status → ${status}` });
+      addActivityLog({ action: "status_alterado", leadEmpresa: lead.empresa, leadId: id, author: currentUser, details: `Status → ${status}` });
     }
     toast({ title: "Status atualizado" });
   };
