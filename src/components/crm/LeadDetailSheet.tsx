@@ -29,11 +29,26 @@ const DARK_STATUS: Record<string, string> = {
   perdido: "bg-red-500/20 text-red-400",
 };
 
-export default function LeadDetailSheet({ lead, open, onClose, onAddNote }: LeadDetailSheetProps) {
+export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDeleteLead }: LeadDetailSheetProps) {
   const [note, setNote] = useState("");
   const [author, setAuthor] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState("");
 
   if (!lead) return null;
+
+  const handleDelete = () => {
+    if (deletePassword === "56239050") {
+      onDeleteLead?.(lead.id);
+      setDeleteDialogOpen(false);
+      setDeletePassword("");
+      setDeleteError("");
+      onClose();
+    } else {
+      setDeleteError("Senha incorreta");
+    }
+  };
 
   const copyScript = (text: string) => {
     const script = text.replace("[SEGMENTO]", lead.segmento);
