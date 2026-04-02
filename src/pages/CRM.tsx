@@ -105,16 +105,19 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
   };
 
   const handleExport = () => {
-    const headers = ["Empresa", "Segmento", "Bairro", "Telefone", "Instagram", "Potencial", "Temperatura", "Status"];
-    const rows = leads.map(l => [l.empresa, l.segmento, l.bairro, l.telefone, l.instagram, l.potencial, l.temperatura, l.status]);
+    const dataToExport = filteredLeads;
+    const headers = ["Empresa", "Segmento", "Bairro", "Cidade", "Telefone", "Instagram", "Potencial", "Temperatura", "Status"];
+    const rows = dataToExport.map(l => [l.empresa, l.segmento, l.bairro, l.cidade || "", l.telefone, l.instagram, l.potencial, l.temperatura, l.status]);
     const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url; a.download = "leads-recorrencia-cg.csv"; a.click();
     URL.revokeObjectURL(url);
-    addActivityLog({ action: "lead_exportado", leadEmpresa: "Base completa", leadId: "", author: currentUser, details: `${leads.length} leads exportados` });
-    toast({ title: "Base exportada!" });
+    const hasFilters = Object.values(filters).some(v => v !== "");
+    const desc = hasFilters ? `${dataToExport.length} leads filtrados exportados` : `${dataToExport.length} leads exportados (base completa)`;
+    addActivityLog({ action: "lead_exportado", leadEmpresa: hasFilters ? "Filtro aplicado" : "Base completa", leadId: "", author: currentUser, details: desc });
+    toast({ title: "Exportação concluída!", description: `${dataToExport.length} leads exportados` });
   };
 
   const handleBairroFilter = (bairro: string) => {
