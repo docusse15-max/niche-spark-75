@@ -78,7 +78,17 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDele
             <div className="grid gap-1.5 text-sm mt-3">
               <p className="flex items-center gap-2 text-foreground"><Building className="h-4 w-4 text-muted-foreground" />{lead.segmento}</p>
               <p className="flex items-center gap-2 text-foreground"><MapPin className="h-4 w-4 text-muted-foreground" />{lead.bairro} — {lead.cidade}</p>
-              <p className="flex items-center gap-2 text-foreground"><Phone className="h-4 w-4 text-muted-foreground" />{lead.telefone}</p>
+              <p className="flex items-center gap-2 text-foreground">
+                <Phone className="h-4 w-4 text-muted-foreground" />{lead.telefone}
+                <a
+                  href={`https://wa.me/55${lead.telefone.replace(/\D/g, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center rounded-md bg-green-600 hover:bg-green-700 text-white px-2 py-0.5 text-xs font-medium ml-1 transition-colors"
+                >
+                  <MessageSquare className="h-3 w-3 mr-1" />WhatsApp
+                </a>
+              </p>
               <p className="flex items-center gap-2 text-foreground"><Instagram className="h-4 w-4 text-muted-foreground" />{lead.instagram}</p>
             </div>
           </div>
