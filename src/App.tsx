@@ -40,6 +40,7 @@ const App = () => {
             <Route path="/" element={<CRM currentUser={currentUser} onLogout={() => { sessionStorage.removeItem("crm_user"); setCurrentUser(null); }} />} />
             <Route path="/log" element={<ActivityLog />} />
             <Route path="/landing" element={<Index />} />
+            <Route path="/roteiro" element={<RoutePlanner />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
