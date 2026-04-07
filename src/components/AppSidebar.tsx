@@ -80,6 +80,19 @@ export function AppSidebar({ currentUser, onLogout }: AppSidebarProps) {
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a
+                    href="https://vfbankdigital.com.br/cred/index.php"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:bg-muted/50 flex items-center"
+                  >
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    {!collapsed && <span>Portal Credenciamento</span>}
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
