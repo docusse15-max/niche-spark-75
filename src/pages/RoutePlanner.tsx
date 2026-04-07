@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleMap, useJsApiLoader, MarkerF, DirectionsRenderer, InfoWindowF } from "@react-google-maps/api";
 import { getInitialLeads, Lead, NICHOS, type Nicho, type LeadTemperature, type LeadStatus, STATUS_LABELS } from "@/data/leads";
-import { CIDADES, type Cidade } from "@/data/cities";
+import { CIDADES, CIDADE_CONFIGS, type Cidade } from "@/data/cities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
