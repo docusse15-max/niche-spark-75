@@ -14,8 +14,7 @@ import NewLeadDialog from "@/components/crm/NewLeadDialog";
 import SearchLeadsDialog from "@/components/crm/SearchLeadsDialog";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { ScrollText, LogOut, User, Route } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { User } from "lucide-react";
 
 const EMPTY_FILTERS: Filters = { search: "", nicho: "", bairro: "", cidade: "", temperatura: "", status: "", potencial: "", responsavel: "" };
 
