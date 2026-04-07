@@ -60,6 +60,29 @@ export function AppSidebar({ currentUser, onLogout }: AppSidebarProps) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-xs text-muted-foreground">
+            {!collapsed && "Portais"}
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a
+                    href="https://facilita.vfbankdigital.com.br/auth/login"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:bg-muted/50 flex items-center"
+                  >
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    {!collapsed && <span>Portal Recorrência</span>}
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter className="border-t border-border p-2">
