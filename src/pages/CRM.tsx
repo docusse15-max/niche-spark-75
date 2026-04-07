@@ -38,8 +38,11 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
     saveLeads(updated);
   }, []);
 
+  const BELEZA_NICHOS = ["Salão de Beleza", "Clínica de Estética"];
+
   const filteredLeads = useMemo(() => {
     return leads.filter(l => {
+      if (belezaFilter && !BELEZA_NICHOS.includes(l.segmento)) return false;
       if (filters.search && !l.empresa.toLowerCase().includes(filters.search.toLowerCase())) return false;
       if (filters.nicho && l.segmento !== filters.nicho) return false;
       if (filters.bairro && extractBairroName(l.bairro) !== filters.bairro) return false;
@@ -51,7 +54,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
       if (filters.responsavel && filters.responsavel !== "sem_responsavel" && l.responsavel !== filters.responsavel) return false;
       return true;
     });
-  }, [leads, filters]);
+  }, [leads, filters, belezaFilter]);
 
   const handleSelectLead = (lead: Lead) => {
     setSelectedLead(lead);
