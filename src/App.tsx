@@ -9,6 +9,7 @@ import CRM from "./pages/CRM.tsx";
 import ActivityLog from "./pages/ActivityLog.tsx";
 import LoginScreen from "./pages/LoginScreen.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import RoutePlanner from "./pages/RoutePlanner.tsx";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => {
             <Route path="/" element={<CRM currentUser={currentUser} onLogout={() => { sessionStorage.removeItem("crm_user"); setCurrentUser(null); }} />} />
             <Route path="/log" element={<ActivityLog />} />
             <Route path="/landing" element={<Index />} />
+            <Route path="/roteiro" element={<RoutePlanner />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

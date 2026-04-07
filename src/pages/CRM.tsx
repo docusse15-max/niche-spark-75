@@ -14,7 +14,7 @@ import NewLeadDialog from "@/components/crm/NewLeadDialog";
 import SearchLeadsDialog from "@/components/crm/SearchLeadsDialog";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { ScrollText, LogOut, User } from "lucide-react";
+import { ScrollText, LogOut, User, Route } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const EMPTY_FILTERS: Filters = { search: "", nicho: "", bairro: "", cidade: "", temperatura: "", status: "", potencial: "", responsavel: "" };
@@ -152,6 +152,9 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
             <span className="flex items-center gap-1 text-xs text-muted-foreground border rounded-md px-2 py-1.5">
               <User className="h-3.5 w-3.5" />{currentUser}
             </span>
+            <Button variant="outline" size="sm" onClick={() => navigate("/roteiro")}>
+              <Route className="h-4 w-4 mr-1" />Roteiro
+            </Button>
             <Button variant="outline" size="sm" onClick={() => navigate("/log")}>
               <ScrollText className="h-4 w-4 mr-1" />Log
             </Button>
