@@ -16,6 +16,7 @@ import ComercialEvolution from "./pages/ComercialEvolution.tsx";
 import VisitCalendar from "./pages/VisitCalendar.tsx";
 import HomeEquity from "./pages/HomeEquity.tsx";
 import GestaoComercialCampo from "./pages/GestaoComercialCampo.tsx";
+import DashboardGestor from "./pages/DashboardGestor.tsx";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +65,7 @@ const App = () => {
                     <Route path="/roteiro" element={<RoutePlanner />} />
                     <Route path="/home-equity" element={<HomeEquity />} />
                     <Route path="/gestao-campo" element={<GestaoComercialCampo />} />
+                    <Route path="/dashboard-gestor" element={<DashboardGestor />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </main>
