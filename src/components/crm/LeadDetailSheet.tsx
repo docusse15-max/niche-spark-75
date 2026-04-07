@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Lead, STATUS_LABELS, SCRIPTS } from "@/data/leads";
-import { Phone, Instagram, MapPin, Building, MessageSquare, Copy, User, Trash2, Navigation, Globe, Star } from "lucide-react";
+import { Phone, Instagram, MapPin, Building, MessageSquare, Copy, User, Trash2, Navigation, Globe, Star, CalendarCheck } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-
+import { supabase } from "@/integrations/supabase/client";
 interface LeadDetailSheetProps {
   lead: Lead | null;
   open: boolean;
