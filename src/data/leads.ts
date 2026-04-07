@@ -223,7 +223,7 @@ function buildLeadsFromAI(): Lead[] {
 const MOCK_LEADS: Lead[] = buildLeadsFromAI();
 
 export function getInitialLeads(): Lead[] {
-  const stored = localStorage.getItem("crm_leads_v7");
+  const stored = localStorage.getItem("crm_leads_v8");
   if (stored) {
     try { return JSON.parse(stored); } catch { /* fall through */ }
   }
@@ -231,7 +231,7 @@ export function getInitialLeads(): Lead[] {
 }
 
 export function saveLeads(leads: Lead[]) {
-  localStorage.setItem("crm_leads_v7", JSON.stringify(leads));
+  localStorage.setItem("crm_leads_v8", JSON.stringify(leads));
 }
 
 // ===== ACTIVITY LOG =====
