@@ -35,6 +35,13 @@ export default function CRMHeader({ leads, onNewLead, onRefresh, onExport, onSea
           </div>
         </div>
         <div className="flex gap-2 flex-wrap">
+          <Button
+            size="sm"
+            onClick={onToggleBeleza}
+            className={`font-semibold hover:opacity-90 ${belezaFilter ? 'bg-pink-500 text-white hover:bg-pink-600' : 'bg-pink-100 text-pink-700 hover:bg-pink-200 border border-pink-300'}`}
+          >
+            <Sparkles className="h-4 w-4 mr-1" />Beleza em Crédito
+          </Button>
           <Button variant="outline" size="sm" onClick={onRefresh} className="border-border hover:border-primary hover:text-primary"><RefreshCw className="h-4 w-4 mr-1" />Atualizar</Button>
           <Button size="sm" onClick={onSearchLeads} className="gold-gradient text-background font-semibold hover:opacity-90"><MapPin className="h-4 w-4 mr-1" />Buscar no Google</Button>
           <Button size="sm" onClick={onNewLead} className="gold-gradient text-background font-semibold hover:opacity-90"><Plus className="h-4 w-4 mr-1" />Novo Lead</Button>
