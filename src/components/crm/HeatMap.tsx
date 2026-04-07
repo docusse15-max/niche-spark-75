@@ -1,9 +1,14 @@
-import { useEffect, useRef, useMemo, useState, useCallback } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import { useMemo, useState, useCallback, useEffect, useRef } from "react";
+import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF } from "@react-google-maps/api";
 import { Lead } from "@/data/leads";
 import { CIDADES, CIDADE_CONFIGS, type Cidade } from "@/data/cities";
 import { cn } from "@/lib/utils";
+import { MapPin, Navigation, MessageSquare, Star } from "lucide-react";
+
+const GOOGLE_MAPS_KEY = "AIzaSyAPHdxmB8MWTBHHulY7YKjWpf7l5clpUps";
+
+const containerStyle = { width: "100%", height: "400px" };
+const defaultCenter = { lat: -21.5, lng: -55.5 };
 
 interface HeatMapProps {
   leads: Lead[];
@@ -14,10 +19,13 @@ interface HeatMapProps {
 }
 
 export default function HeatMap({ leads, selectedBairro, onSelectBairro, selectedLeadId, onSelectLeadOnMap }: HeatMapProps) {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstance = useRef<L.Map | null>(null);
-  const markersRef = useRef<L.LayerGroup | null>(null);
   const [selectedCity, setSelectedCity] = useState<string>("all");
+  const [infoLead, setInfoLead] = useState<Lead | null>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: GOOGLE_MAPS_KEY,
+  });
 
   const visibleLeads = useMemo(() => {
     let filtered = leads;
@@ -26,50 +34,18 @@ export default function HeatMap({ leads, selectedBairro, onSelectBairro, selecte
     return filtered;
   }, [leads, selectedCity, selectedBairro]);
 
-  // Initialize map
-  useEffect(() => {
-    if (!mapRef.current || mapInstance.current) return;
-    const map = L.map(mapRef.current, {
-      center: [-21.5, -55.5],
-      zoom: 7,
-      zoomControl: true,
-      scrollWheelZoom: true,
-    });
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '© OpenStreetMap',
-      maxZoom: 18,
-    }).addTo(map);
-    markersRef.current = L.layerGroup().addTo(map);
-    mapInstance.current = map;
-    return () => { map.remove(); mapInstance.current = null; };
+  const onLoad = useCallback((map: google.maps.Map) => {
+    mapRef.current = map;
   }, []);
-
-  // Update markers
-  useEffect(() => {
-    if (!mapInstance.current || !markersRef.current) return;
-    markersRef.current.clearLayers();
-    visibleLeads.forEach(lead => {
-      if (!lead.lat || !lead.lng) return;
-      const isSelected = selectedLeadId === lead.id;
-      const marker = L.circleMarker([lead.lat, lead.lng], {
-        radius: isSelected ? 10 : 6,
-        fillColor: isSelected ? "#D4AF37" : "#8B6914",
-        color: isSelected ? "#FFD700" : "#5a4510",
-        weight: isSelected ? 3 : 1,
-        fillOpacity: isSelected ? 1 : 0.7,
-      });
-      marker.bindTooltip(`<strong>${lead.empresa}</strong><br/>${lead.segmento}<br/>${lead.bairro} · ${lead.cidade}`, { direction: "top", offset: [0, -8] });
-      marker.on("click", () => onSelectLeadOnMap(lead));
-      marker.addTo(markersRef.current!);
-    });
-  }, [visibleLeads, selectedLeadId, onSelectLeadOnMap]);
 
   // Fly to selected lead
   useEffect(() => {
-    if (!mapInstance.current || !selectedLeadId) return;
+    if (!mapRef.current || !selectedLeadId) return;
     const lead = leads.find(l => l.id === selectedLeadId);
     if (lead?.lat && lead?.lng) {
-      mapInstance.current.flyTo([lead.lat, lead.lng], 14, { duration: 0.8 });
+      mapRef.current.panTo({ lat: lead.lat, lng: lead.lng });
+      mapRef.current.setZoom(15);
+      setInfoLead(lead);
     }
   }, [selectedLeadId, leads]);
 
@@ -77,13 +53,16 @@ export default function HeatMap({ leads, selectedBairro, onSelectBairro, selecte
     const next = selectedCity === city ? "all" : city;
     setSelectedCity(next);
     onSelectBairro("");
+    if (!mapRef.current) return;
     if (next === "all") {
-      mapInstance.current?.flyTo([-21.5, -55.5], 7, { duration: 0.8 });
+      mapRef.current.panTo(defaultCenter);
+      mapRef.current.setZoom(7);
     } else {
       const cityLeads = leads.filter(l => l.cidade === next && l.lat && l.lng);
       if (cityLeads.length > 0) {
-        const bounds = L.latLngBounds(cityLeads.map(l => [l.lat!, l.lng!]));
-        mapInstance.current?.flyToBounds(bounds, { padding: [30, 30], duration: 0.8 });
+        const bounds = new google.maps.LatLngBounds();
+        cityLeads.forEach(l => bounds.extend({ lat: l.lat!, lng: l.lng! }));
+        mapRef.current.fitBounds(bounds, 40);
       }
     }
   }, [selectedCity, leads, onSelectBairro]);
@@ -91,14 +70,16 @@ export default function HeatMap({ leads, selectedBairro, onSelectBairro, selecte
   const handleBairroClick = useCallback((bairro: string) => {
     const next = selectedBairro === bairro ? "" : bairro;
     onSelectBairro(next);
-    if (next && selectedCity !== "all") {
+    if (next && selectedCity !== "all" && mapRef.current) {
       const config = CIDADE_CONFIGS[selectedCity as Cidade];
       const b = config?.bairros.find(x => x.nome === next);
-      if (b) mapInstance.current?.flyTo(b.coords, 14, { duration: 0.8 });
+      if (b) {
+        mapRef.current.panTo({ lat: b.coords[0], lng: b.coords[1] });
+        mapRef.current.setZoom(14);
+      }
     }
   }, [selectedBairro, selectedCity, onSelectBairro]);
 
-  // Counts
   const cityCounts = useMemo(() => {
     const c: Record<string, number> = {};
     for (const city of CIDADES) c[city] = leads.filter(l => l.cidade === city).length;
@@ -118,14 +99,98 @@ export default function HeatMap({ leads, selectedBairro, onSelectBairro, selecte
     return c;
   }, [leads, selectedCity, bairrosForCity]);
 
+  const getWhatsAppUrl = (phone: string) => {
+    const cleaned = phone.replace(/\D/g, "");
+    return cleaned.startsWith("55") ? `https://wa.me/${cleaned}` : `https://wa.me/55${cleaned}`;
+  };
+
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden">
       <div className="flex items-center justify-between p-4 pb-2">
-        <h3 className="font-semibold text-sm gold-text">📍 Mapa de Leads — MS</h3>
+        <h3 className="font-semibold text-sm gold-text">📍 Mapa de Leads — Google Maps</h3>
         <span className="text-[10px] text-muted-foreground">{visibleLeads.length} leads visíveis</span>
       </div>
 
-      <div ref={mapRef} className="h-[400px] w-full" style={{ zIndex: 1 }} />
+      {isLoaded ? (
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={defaultCenter}
+          zoom={7}
+          onLoad={onLoad}
+          options={{
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: true,
+          }}
+        >
+          {visibleLeads.map(lead => {
+            if (!lead.lat || !lead.lng) return null;
+            const isSelected = selectedLeadId === lead.id;
+            return (
+              <MarkerF
+                key={lead.id}
+                position={{ lat: lead.lat, lng: lead.lng }}
+                onClick={() => {
+                  onSelectLeadOnMap(lead);
+                  setInfoLead(lead);
+                }}
+                icon={{
+                  path: google.maps.SymbolPath.CIRCLE,
+                  scale: isSelected ? 12 : 7,
+                  fillColor: isSelected ? "#D4AF37" : "#8B6914",
+                  fillOpacity: isSelected ? 1 : 0.8,
+                  strokeColor: isSelected ? "#FFD700" : "#5a4510",
+                  strokeWeight: isSelected ? 3 : 1,
+                }}
+              />
+            );
+          })}
+
+          {infoLead && infoLead.lat && infoLead.lng && (
+            <InfoWindowF
+              position={{ lat: infoLead.lat, lng: infoLead.lng }}
+              onCloseClick={() => setInfoLead(null)}
+            >
+              <div className="p-1 max-w-[240px]" style={{ color: "#111" }}>
+                {/* Photo */}
+                {infoLead.fotos && infoLead.fotos.length > 0 && (
+                  <img src={infoLead.fotos[0]} alt={infoLead.empresa} className="w-full h-20 object-cover rounded mb-1.5" />
+                )}
+                <p className="font-bold text-sm">{infoLead.empresa}</p>
+                <p className="text-xs text-gray-600">{infoLead.segmento} · {infoLead.bairro}</p>
+                {infoLead.avaliacao && (
+                  <p className="text-xs flex items-center gap-0.5 mt-0.5">
+                    <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+                    {infoLead.avaliacao} ({infoLead.totalAvaliacoes})
+                  </p>
+                )}
+                <div className="flex gap-1.5 mt-2">
+                  {infoLead.telefone && (
+                    <a href={getWhatsAppUrl(infoLead.telefone)} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center rounded bg-green-600 text-white px-2 py-0.5 text-[10px]">
+                      <MessageSquare className="h-3 w-3 mr-0.5" />Zap
+                    </a>
+                  )}
+                  {infoLead.googleMapsUrl && (
+                    <a href={infoLead.googleMapsUrl} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center rounded bg-blue-600 text-white px-2 py-0.5 text-[10px]">
+                      <MapPin className="h-3 w-3 mr-0.5" />Maps
+                    </a>
+                  )}
+                  <a href={`https://waze.com/ul?ll=${infoLead.lat},${infoLead.lng}&navigate=yes`} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center rounded bg-cyan-600 text-white px-2 py-0.5 text-[10px]">
+                    <Navigation className="h-3 w-3 mr-0.5" />Waze
+                  </a>
+                </div>
+              </div>
+            </InfoWindowF>
+          )}
+        </GoogleMap>
+      ) : (
+        <div className="h-[400px] flex items-center justify-center text-muted-foreground">
+          Carregando Google Maps...
+        </div>
+      )}
 
       {/* City filter buttons */}
       <div className="p-3 space-y-2">
@@ -147,7 +212,6 @@ export default function HeatMap({ leads, selectedBairro, onSelectBairro, selecte
           ))}
         </div>
 
-        {/* Bairro filter when city selected */}
         {bairrosForCity.length > 0 && (
           <>
             <p className="text-[10px] text-muted-foreground mt-2">Bairros de {selectedCity}:</p>
