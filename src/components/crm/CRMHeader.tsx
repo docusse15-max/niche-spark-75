@@ -13,7 +13,7 @@ interface CRMHeaderProps {
   onToggleBeleza?: () => void;
 }
 
-export default function CRMHeader({ leads, onNewLead, onRefresh, onExport, onSearchLeads }: CRMHeaderProps) {
+export default function CRMHeader({ leads, onNewLead, onRefresh, onExport, onSearchLeads, belezaFilter, onToggleBeleza }: CRMHeaderProps) {
   const stats = [
     { label: "Total de Leads", value: leads.length, icon: Users, accent: false },
     { label: "Novos", value: leads.filter(l => l.status === "novo").length, icon: UserPlus, accent: true },
