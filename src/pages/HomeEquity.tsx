@@ -2,13 +2,29 @@ import { useMemo, useState, useCallback, useRef } from "react";
 import { GoogleMap, useJsApiLoader, CircleF, InfoWindowF } from "@react-google-maps/api";
 import { BAIRROS_EQUITY, CIDADES_EQUITY, type BairroEquity } from "@/data/home-equity-data";
 import { cn } from "@/lib/utils";
-import { Home, TrendingUp, MapPin, DollarSign, Building2, Target } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Home, TrendingUp, MapPin, DollarSign, Building2, Target, Search, ExternalLink, Loader2, Bed, Maximize } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const GOOGLE_MAPS_KEY = "AIzaSyAPHdxmB8MWTBHHulY7YKjWpf7l5clpUps";
 const containerStyle = { width: "100%", height: "500px" };
 const defaultCenter = { lat: -18.5, lng: -52.0 };
+
+interface Listing {
+  id: string;
+  titulo: string;
+  descricao: string;
+  preco: string | null;
+  area: number | null;
+  quartos: number | null;
+  url: string;
+  fonte: string;
+  cidade: string;
+  bairro: string | null;
+}
 
 function getHeatColor(nivel: string, valorM2: number, maxValorM2: number): string {
   const ratio = valorM2 / maxValorM2;
@@ -25,11 +41,23 @@ function formatCurrency(value: number): string {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(value);
 }
 
+const fonteBadgeColors: Record<string, string> = {
+  "OLX": "bg-purple-500/20 text-purple-400 border-purple-500/30",
+  "Zap Imóveis": "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  "Viva Real": "bg-orange-500/20 text-orange-400 border-orange-500/30",
+  "Imóvel Web": "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
+  "Web": "bg-secondary text-muted-foreground border-border",
+};
+
 export default function HomeEquity() {
   const [selectedCity, setSelectedCity] = useState<string>("Campo Grande");
   const [infoBairro, setInfoBairro] = useState<BairroEquity | null>(null);
   const [sortBy, setSortBy] = useState<"valor" | "oportunidades" | "crescimento">("valor");
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loadingListings, setLoadingListings] = useState(false);
+  const [searchedBairro, setSearchedBairro] = useState<string>("");
   const mapRef = useRef<google.maps.Map | null>(null);
+  const { toast } = useToast();
 
   const { isLoaded } = useJsApiLoader({ googleMapsApiKey: GOOGLE_MAPS_KEY });
 
@@ -66,6 +94,8 @@ export default function HomeEquity() {
   const handleCityClick = useCallback((city: string) => {
     setSelectedCity(city);
     setInfoBairro(null);
+    setListings([]);
+    setSearchedBairro("");
     if (!mapRef.current) return;
     const cityBairros = BAIRROS_EQUITY.filter(b => b.cidade === city);
     if (cityBairros.length > 0) {
@@ -82,6 +112,30 @@ export default function HomeEquity() {
       mapRef.current.setZoom(14);
     }
   }, []);
+
+  const searchListings = useCallback(async (cidade: string, bairro?: string) => {
+    setLoadingListings(true);
+    setSearchedBairro(bairro || cidade);
+    try {
+      const { data, error } = await supabase.functions.invoke("scrape-imoveis", {
+        body: { cidade, bairro },
+      });
+      if (error) throw error;
+      if (data?.success && data.data) {
+        setListings(data.data);
+        toast({ title: "Anúncios encontrados", description: `${data.data.length} imóveis à venda em ${bairro || cidade}` });
+      } else {
+        setListings([]);
+        toast({ title: "Sem resultados", description: "Nenhum anúncio encontrado", variant: "destructive" });
+      }
+    } catch (err) {
+      console.error(err);
+      toast({ title: "Erro", description: "Falha ao buscar anúncios", variant: "destructive" });
+      setListings([]);
+    } finally {
+      setLoadingListings(false);
+    }
+  }, [toast]);
 
   const nivelBadge = (nivel: string) => {
     const colors: Record<string, string> = {
@@ -212,6 +266,12 @@ export default function HomeEquity() {
                       <p>📊 Ticket: {formatCurrency(infoBairro.ticketMedio)}</p>
                       <p>📈 +{infoBairro.crescimento12m}% (12m)</p>
                     </div>
+                    <button
+                      onClick={() => searchListings(infoBairro.cidade, infoBairro.nome)}
+                      className="mt-2 w-full text-center bg-blue-600 text-white rounded px-2 py-1 text-[10px] font-medium"
+                    >
+                      🔍 Buscar anúncios reais
+                    </button>
                   </div>
                 </InfoWindowF>
               )}
@@ -225,6 +285,16 @@ export default function HomeEquity() {
         <div className="bg-card border border-border rounded-lg p-3">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-sm gold-text">📋 Ranking de Bairros</h3>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-[10px] h-7"
+              onClick={() => searchListings(selectedCity)}
+              disabled={loadingListings}
+            >
+              {loadingListings ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Search className="h-3 w-3 mr-1" />}
+              Buscar anúncios
+            </Button>
           </div>
 
           <div className="flex gap-1 mb-3">
@@ -284,6 +354,72 @@ export default function HomeEquity() {
           </div>
         </div>
       </div>
+
+      {/* Real Estate Listings */}
+      {(listings.length > 0 || loadingListings) && (
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-sm gold-text">
+              🏠 Anúncios Reais — {searchedBairro}
+            </h3>
+            <span className="text-[10px] text-muted-foreground">
+              {listings.length} resultado{listings.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+
+          {loadingListings ? (
+            <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <span className="text-sm">Buscando anúncios em tempo real...</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {listings.map(listing => (
+                <a
+                  key={listing.id}
+                  href={listing.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block rounded-lg border border-border p-3 hover:border-primary/50 hover:bg-secondary/30 transition-all group"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-xs font-semibold text-foreground line-clamp-2 flex-1 group-hover:text-primary transition-colors">
+                      {listing.titulo}
+                    </p>
+                    <ExternalLink className="h-3 w-3 text-muted-foreground shrink-0 mt-0.5" />
+                  </div>
+
+                  {listing.descricao && (
+                    <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2">{listing.descricao}</p>
+                  )}
+
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    {listing.preco && (
+                      <span className="text-xs font-bold text-primary">{listing.preco}</span>
+                    )}
+                    {listing.quartos && (
+                      <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                        <Bed className="h-3 w-3" />{listing.quartos}
+                      </span>
+                    )}
+                    {listing.area && (
+                      <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                        <Maximize className="h-3 w-3" />{listing.area}m²
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-2">
+                    <Badge className={cn("text-[9px] border", fonteBadgeColors[listing.fonte] || fonteBadgeColors["Web"])}>
+                      {listing.fonte}
+                    </Badge>
+                  </div>
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
