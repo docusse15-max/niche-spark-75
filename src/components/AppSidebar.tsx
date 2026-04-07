@@ -1,4 +1,4 @@
-import { LayoutDashboard, Route, ScrollText, TrendingUp, LogOut, User } from "lucide-react";
+import { LayoutDashboard, Route, ScrollText, TrendingUp, LogOut, User, CalendarDays } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 const menuItems = [
   { title: "CRM", url: "/", icon: LayoutDashboard },
   { title: "Evolução Comercial", url: "/evolucao", icon: TrendingUp },
+  { title: "Agenda de Visitas", url: "/agenda", icon: CalendarDays },
   { title: "Roteiro", url: "/roteiro", icon: Route },
   { title: "Log de Atividades", url: "/log", icon: ScrollText },
 ];

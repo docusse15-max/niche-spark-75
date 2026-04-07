@@ -13,6 +13,7 @@ import LoginScreen from "./pages/LoginScreen.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import RoutePlanner from "./pages/RoutePlanner.tsx";
 import ComercialEvolution from "./pages/ComercialEvolution.tsx";
+import VisitCalendar from "./pages/VisitCalendar.tsx";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ const App = () => {
                   <Routes>
                     <Route path="/" element={<CRM currentUser={currentUser} onLogout={handleLogout} />} />
                     <Route path="/evolucao" element={<ComercialEvolution />} />
+                    <Route path="/agenda" element={<VisitCalendar />} />
                     <Route path="/log" element={<ActivityLog />} />
                     <Route path="/landing" element={<Index />} />
                     <Route path="/roteiro" element={<RoutePlanner />} />
