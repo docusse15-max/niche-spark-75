@@ -1,4 +1,4 @@
-import { LayoutDashboard, Route, ScrollText, TrendingUp, LogOut, User, CalendarDays, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Route, ScrollText, TrendingUp, LogOut, User, CalendarDays, ExternalLink, Home } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -21,6 +21,7 @@ const menuItems = [
   { title: "Agenda de Visitas", url: "/agenda", icon: CalendarDays },
   { title: "Roteiro", url: "/roteiro", icon: Route },
   { title: "Log de Atividades", url: "/log", icon: ScrollText },
+  { title: "Home Equity", url: "/home-equity", icon: Home },
 ];
 
 interface AppSidebarProps {

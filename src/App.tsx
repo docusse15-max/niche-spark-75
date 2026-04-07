@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound.tsx";
 import RoutePlanner from "./pages/RoutePlanner.tsx";
 import ComercialEvolution from "./pages/ComercialEvolution.tsx";
 import VisitCalendar from "./pages/VisitCalendar.tsx";
+import HomeEquity from "./pages/HomeEquity.tsx";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => {
                     <Route path="/log" element={<ActivityLog />} />
                     <Route path="/landing" element={<Index />} />
                     <Route path="/roteiro" element={<RoutePlanner />} />
+                    <Route path="/home-equity" element={<HomeEquity />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </main>
