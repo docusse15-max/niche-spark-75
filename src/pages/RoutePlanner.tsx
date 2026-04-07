@@ -247,7 +247,18 @@ export default function RoutePlanner() {
                 <div className="space-y-2">
                   <div>
                     <label className="text-[10px] text-muted-foreground">Cidade</label>
-                    <Select value={filterCidade} onValueChange={setFilterCidade}>
+                    <Select value={filterCidade} onValueChange={(val) => {
+                      setFilterCidade(val);
+                      // Auto-center on city
+                      if (val !== "todas" && CIDADE_CONFIGS[val as Cidade]) {
+                        const [lat, lng] = CIDADE_CONFIGS[val as Cidade].center;
+                        setOrigin({ lat, lng });
+                        setAddress(`Centro, ${val} - MS`);
+                        setDirections(null);
+                        setSelectedRoute([]);
+                        toast({ title: `Mapa centralizado em ${val}` });
+                      }
+                    }}>
                       <SelectTrigger className="h-7 text-xs"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="todas">Todas as cidades</SelectItem>
