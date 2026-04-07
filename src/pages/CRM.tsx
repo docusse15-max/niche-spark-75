@@ -145,7 +145,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
       <div className="max-w-[1400px] mx-auto px-4 py-4 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <CRMHeader leads={leads} onNewLead={() => setNewLeadOpen(true)} onRefresh={() => { persist(getInitialLeads()); toast({ title: "Base atualizada" }); }} onExport={handleExport} onSearchLeads={() => setSearchLeadsOpen(true)} />
+            <CRMHeader leads={leads} onNewLead={() => setNewLeadOpen(true)} onRefresh={() => { persist(getInitialLeads()); toast({ title: "Base atualizada" }); }} onExport={handleExport} onSearchLeads={() => setSearchLeadsOpen(true)} belezaFilter={belezaFilter} onToggleBeleza={() => setBelezaFilter(v => !v)} />
           </div>
         </div>
         <div className="flex items-center justify-between">
