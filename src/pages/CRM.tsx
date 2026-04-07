@@ -11,6 +11,7 @@ import ProductivityPanel from "@/components/crm/ProductivityPanel";
 import ComercialRanking from "@/components/crm/ComercialRanking";
 import ContactTimeline from "@/components/crm/ContactTimeline";
 import NewLeadDialog from "@/components/crm/NewLeadDialog";
+import SearchLeadsDialog from "@/components/crm/SearchLeadsDialog";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { ScrollText, LogOut, User } from "lucide-react";
@@ -29,6 +30,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [newLeadOpen, setNewLeadOpen] = useState(false);
+  const [searchLeadsOpen, setSearchLeadsOpen] = useState(false);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -94,6 +96,14 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
     toast({ title: "Lead adicionado!", description: lead.empresa });
   };
 
+  const handleImportLeads = (newLeads: Lead[]) => {
+    const updated = [...newLeads, ...leads];
+    persist(updated);
+    for (const lead of newLeads) {
+      addActivityLog({ action: "lead_importado_ia", leadEmpresa: lead.empresa, leadId: lead.id, author: currentUser, details: `${lead.segmento} · ${lead.cidade} (IA)` });
+    }
+  };
+
   const handleDeleteLead = (id: string) => {
     const lead = leads.find(l => l.id === id);
     const updated = leads.filter(l => l.id !== id);
@@ -130,7 +140,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
       <div className="max-w-[1400px] mx-auto px-4 py-4 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <CRMHeader leads={leads} onNewLead={() => setNewLeadOpen(true)} onRefresh={() => { persist(getInitialLeads()); toast({ title: "Base atualizada" }); }} onExport={handleExport} />
+            <CRMHeader leads={leads} onNewLead={() => setNewLeadOpen(true)} onRefresh={() => { persist(getInitialLeads()); toast({ title: "Base atualizada" }); }} onExport={handleExport} onSearchLeads={() => setSearchLeadsOpen(true)} />
           </div>
         </div>
         <div className="flex items-center justify-between">
@@ -165,6 +175,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
 
       <LeadDetailSheet lead={selectedLead} open={sheetOpen} onClose={() => setSheetOpen(false)} onAddNote={handleAddNote} onDeleteLead={handleDeleteLead} />
       <NewLeadDialog open={newLeadOpen} onClose={() => setNewLeadOpen(false)} onSave={handleNewLead} />
+      <SearchLeadsDialog open={searchLeadsOpen} onClose={() => setSearchLeadsOpen(false)} onImport={handleImportLeads} existingLeads={leads} />
     </div>
   );
 }
