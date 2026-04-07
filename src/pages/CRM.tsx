@@ -48,7 +48,8 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
       if (filters.temperatura && l.temperatura !== filters.temperatura) return false;
       if (filters.status && l.status !== filters.status) return false;
       if (filters.potencial && l.potencial !== filters.potencial) return false;
-      if (filters.responsavel !== undefined && filters.responsavel !== "" && l.responsavel !== filters.responsavel) return false;
+      if (filters.responsavel === "sem_responsavel" && l.responsavel) return false;
+      if (filters.responsavel && filters.responsavel !== "sem_responsavel" && l.responsavel !== filters.responsavel) return false;
       return true;
     });
   }, [leads, filters]);

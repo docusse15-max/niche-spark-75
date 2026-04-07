@@ -146,7 +146,7 @@ export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">👤 Todos</SelectItem>
-            <SelectItem value="">Sem responsável</SelectItem>
+            <SelectItem value="sem_responsavel">Sem responsável</SelectItem>
             {RESPONSAVEIS.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
           </SelectContent>
         </Select>
