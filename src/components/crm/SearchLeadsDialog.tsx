@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, Plus, MessageSquare } from "lucide-react";
+import { Loader2, Search, Plus, MessageSquare, MapPin, Navigation, Star, Phone, Globe } from "lucide-react";
 import { NICHOS, type Nicho, type Lead } from "@/data/leads";
 import { CIDADES, CIDADE_CONFIGS, type Cidade } from "@/data/cities";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,19 +19,28 @@ interface SearchLeadsDialogProps {
   existingLeads: Lead[];
 }
 
-interface AILead {
+interface PlaceLead {
   empresa: string;
   telefone: string;
+  telefoneInternacional: string;
+  endereco: string;
   bairro: string;
-  instagram: string;
-  descricao: string;
+  lat: number;
+  lng: number;
+  googleMapsUrl: string;
+  placeId: string;
+  fotos: string[];
+  website: string;
+  avaliacao: number | null;
+  totalAvaliacoes: number;
+  horarioFuncionamento: string[];
 }
 
 export default function SearchLeadsDialog({ open, onClose, onImport, existingLeads }: SearchLeadsDialogProps) {
   const [nicho, setNicho] = useState<string>("");
   const [cidade, setCidade] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<AILead[]>([]);
+  const [results, setResults] = useState<PlaceLead[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [searched, setSearched] = useState(false);
 
@@ -46,7 +55,7 @@ export default function SearchLeadsDialog({ open, onClose, onImport, existingLea
     setSearched(false);
 
     try {
-      const { data, error } = await supabase.functions.invoke("search-leads", {
+      const { data, error } = await supabase.functions.invoke("search-places", {
         body: { nicho, cidade },
       });
 
@@ -60,6 +69,8 @@ export default function SearchLeadsDialog({ open, onClose, onImport, existingLea
 
       if (leads.length === 0) {
         toast({ title: "Nenhum resultado encontrado", description: "Tente outro nicho ou cidade." });
+      } else {
+        toast({ title: `${leads.length} estabelecimentos reais encontrados!`, description: "Dados do Google Maps" });
       }
     } catch (e: any) {
       console.error(e);
@@ -83,40 +94,52 @@ export default function SearchLeadsDialog({ open, onClose, onImport, existingLea
     else setSelected(new Set(results.map((_, i) => i)));
   };
 
+  const getWazeUrl = (lat: number, lng: number) => `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+
+  const getWhatsAppUrl = (phone: string) => {
+    const cleaned = phone.replace(/\D/g, "");
+    // If already has country code
+    if (cleaned.startsWith("55")) return `https://wa.me/${cleaned}`;
+    return `https://wa.me/55${cleaned}`;
+  };
+
   const handleImport = () => {
     const maxId = existingLeads.reduce((max, l) => Math.max(max, parseInt(l.id) || 0), 0);
     const cidadeTyped = cidade as Cidade;
-    const config = CIDADE_CONFIGS[cidadeTyped];
-    const bairros = config?.bairros || [];
 
     const newLeads: Lead[] = Array.from(selected).map((idx, i) => {
       const r = results[idx];
-      const bairroObj = bairros.find(b => b.nome.toLowerCase() === r.bairro?.toLowerCase()) || bairros[0];
       return {
         id: String(maxId + i + 1),
         empresa: r.empresa,
         segmento: nicho as Nicho,
-        bairro: r.bairro || bairroObj?.nome || "",
+        bairro: r.bairro || "",
         cidade: cidadeTyped,
-        telefone: r.telefone,
-        instagram: r.instagram || "",
+        telefone: r.telefone || "",
+        instagram: "",
         potencial: "medio" as const,
         temperatura: "frio" as const,
         status: "novo" as const,
         ultimoContato: "",
         proximaAcao: "",
         responsavel: "",
-        observacoes: "Importado via busca IA",
-        descricao: r.descricao || "",
+        observacoes: "",
+        descricao: r.endereco || "",
         motivoRecorrencia: "",
         historico: [],
-        lat: bairroObj ? bairroObj.coords[0] + (Math.random() - 0.5) * 0.01 : undefined,
-        lng: bairroObj ? bairroObj.coords[1] + (Math.random() - 0.5) * 0.01 : undefined,
+        lat: r.lat,
+        lng: r.lng,
+        googleMapsUrl: r.googleMapsUrl,
+        fotos: r.fotos,
+        endereco: r.endereco,
+        avaliacao: r.avaliacao,
+        totalAvaliacoes: r.totalAvaliacoes,
+        website: r.website,
       };
     });
 
     onImport(newLeads);
-    toast({ title: `${newLeads.length} leads importados!`, description: `${nicho} em ${cidade}` });
+    toast({ title: `${newLeads.length} leads reais importados!`, description: `${nicho} em ${cidade} — Google Maps` });
     setResults([]);
     setSearched(false);
     onClose();
@@ -124,11 +147,11 @@ export default function SearchLeadsDialog({ open, onClose, onImport, existingLea
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
-      <DialogContent className="sm:max-w-[600px] max-h-[85vh] flex flex-col">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Search className="h-5 w-5 text-primary" />
-            Buscar Leads Reais com IA
+            <MapPin className="h-5 w-5 text-primary" />
+            Buscar Leads Reais — Google Maps
           </DialogTitle>
         </DialogHeader>
 
@@ -154,7 +177,7 @@ export default function SearchLeadsDialog({ open, onClose, onImport, existingLea
         </div>
 
         <Button onClick={handleSearch} disabled={loading || !nicho || !cidade} className="gold-gradient text-background font-semibold">
-          {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Buscando com IA...</> : <><Search className="h-4 w-4 mr-2" />Buscar Estabelecimentos</>}
+          {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Buscando no Google Maps...</> : <><Search className="h-4 w-4 mr-2" />Buscar no Google Maps</>}
         </Button>
 
         {searched && results.length > 0 && (
@@ -165,29 +188,62 @@ export default function SearchLeadsDialog({ open, onClose, onImport, existingLea
                 {selected.size === results.length ? "Desmarcar todos" : "Selecionar todos"}
               </Button>
             </div>
-            <ScrollArea className="flex-1 max-h-[350px] border rounded-md">
+            <ScrollArea className="flex-1 max-h-[400px] border rounded-md">
               <div className="divide-y divide-border">
                 {results.map((r, idx) => (
                   <label key={idx} className="flex items-start gap-3 p-3 hover:bg-muted/50 cursor-pointer transition-colors">
                     <Checkbox checked={selected.has(idx)} onCheckedChange={() => toggleSelect(idx)} className="mt-1" />
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm text-foreground truncate">{r.empresa}</p>
-                      <p className="text-xs text-muted-foreground">{r.bairro}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="outline" className="text-[10px] px-1.5 py-0">{r.telefone}</Badge>
-                        {r.instagram && <Badge variant="outline" className="text-[10px] px-1.5 py-0">{r.instagram}</Badge>}
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-sm text-foreground truncate">{r.empresa}</p>
+                        {r.avaliacao && (
+                          <span className="flex items-center gap-0.5 text-[10px] text-yellow-500">
+                            <Star className="h-3 w-3 fill-yellow-500" />{r.avaliacao} ({r.totalAvaliacoes})
+                          </span>
+                        )}
                       </div>
-                      {r.descricao && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">{r.descricao}</p>}
+                      <p className="text-xs text-muted-foreground truncate">{r.endereco}</p>
+
+                      {/* Photos */}
+                      {r.fotos.length > 0 && (
+                        <div className="flex gap-1 mt-1.5">
+                          {r.fotos.slice(0, 3).map((url, fi) => (
+                            <img key={fi} src={url} alt={r.empresa} className="h-12 w-16 object-cover rounded border border-border" loading="lazy" />
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Action buttons */}
+                      <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                        {r.telefone && (
+                          <a href={getWhatsAppUrl(r.telefone)} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                            className="inline-flex items-center rounded bg-green-600 hover:bg-green-700 text-white px-2 py-0.5 text-[10px] transition-colors">
+                            <MessageSquare className="h-3 w-3 mr-1" />WhatsApp
+                          </a>
+                        )}
+                        <a href={r.googleMapsUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                          className="inline-flex items-center rounded bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 text-[10px] transition-colors">
+                          <MapPin className="h-3 w-3 mr-1" />Google Maps
+                        </a>
+                        {r.lat && r.lng && (
+                          <a href={getWazeUrl(r.lat, r.lng)} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                            className="inline-flex items-center rounded bg-cyan-600 hover:bg-cyan-700 text-white px-2 py-0.5 text-[10px] transition-colors">
+                            <Navigation className="h-3 w-3 mr-1" />Waze
+                          </a>
+                        )}
+                        {r.website && (
+                          <a href={r.website} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                            className="inline-flex items-center rounded bg-muted hover:bg-muted/80 text-foreground px-2 py-0.5 text-[10px] transition-colors border border-border">
+                            <Globe className="h-3 w-3 mr-1" />Site
+                          </a>
+                        )}
+                        {r.telefone && (
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                            <Phone className="h-2.5 w-2.5 mr-0.5" />{r.telefone}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-                    <a
-                      href={`https://wa.me/55${r.telefone.replace(/\D/g, "")}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={e => e.stopPropagation()}
-                      className="shrink-0 mt-1 inline-flex items-center rounded bg-green-600 hover:bg-green-700 text-white px-2 py-1 text-[10px] transition-colors"
-                    >
-                      <MessageSquare className="h-3 w-3 mr-1" />Zap
-                    </a>
                   </label>
                 ))}
               </div>
@@ -199,7 +255,7 @@ export default function SearchLeadsDialog({ open, onClose, onImport, existingLea
           <DialogFooter>
             <Button variant="outline" onClick={onClose}>Cancelar</Button>
             <Button onClick={handleImport} disabled={selected.size === 0} className="gold-gradient text-background font-semibold">
-              <Plus className="h-4 w-4 mr-1" />Importar {selected.size} leads
+              <Plus className="h-4 w-4 mr-1" />Importar {selected.size} leads reais
             </Button>
           </DialogFooter>
         )}
