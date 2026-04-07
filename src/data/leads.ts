@@ -195,82 +195,53 @@ const CIDADE_DDD: Record<Cidade, string> = {
   "Rio Brilhante": "67",
 };
 
-function generateLeads(): Lead[] {
-  const leads: Lead[] = [];
-  let id = 1;
+import aiLeadsRaw from "./ai-leads.json";
+
+function buildLeadsFromAI(): Lead[] {
   const potenciais: LeadPotential[] = ["baixo", "medio", "alto", "premium"];
   const potencialWeights = [0.15, 0.35, 0.35, 0.15];
-
   function pickPotencial(): LeadPotential {
     const r = Math.random();
     let cum = 0;
-    for (let i = 0; i < potenciais.length; i++) {
-      cum += potencialWeights[i];
-      if (r < cum) return potenciais[i];
-    }
+    for (let i = 0; i < potenciais.length; i++) { cum += potencialWeights[i]; if (r < cum) return potenciais[i]; }
     return "medio";
   }
 
-  // Leads per city: CG gets more, others get proportional
-  const leadsPerCity: Record<Cidade, number> = {
-    "Campo Grande": 350,
-    "Dourados": 100,
-    "Ponta Porã": 60,
-    "Aquidauana": 40,
-    "Sidrolândia": 35,
-    "Bonito": 35,
-    "Corumbá": 80,
-    "Maracaju": 50,
-    "Rio Brilhante": 50,
-  };
-
-  for (const cidade of CIDADES) {
+  return (aiLeadsRaw as any[]).map((raw, idx) => {
+    const cidade = (raw.cidade || "Campo Grande") as Cidade;
     const config = CIDADE_CONFIGS[cidade];
-    const count = leadsPerCity[cidade];
-    const bairros = config.bairros;
-    const ddd = CIDADE_DDD[cidade];
+    const bairros = config?.bairros || [];
+    const bairroObj = bairros.find(b => b.nome.toLowerCase() === (raw.bairro || "").toLowerCase()) || bairros[Math.floor(Math.random() * bairros.length)];
+    const nicho = (NICHOS.includes(raw.nicho) ? raw.nicho : "Serviços B2B") as Nicho;
 
-    for (let i = 0; i < count; i++) {
-      const nicho = NICHOS[Math.floor(Math.random() * NICHOS.length)];
-      const names = EMPRESA_NAMES[nicho];
-      const nameBase = names[Math.floor(Math.random() * names.length)];
-      const bairroObj = bairros[Math.floor(Math.random() * bairros.length)];
-      
-      const suffix = cidade === "Campo Grande" ? "" : ` ${cidade.split(" ")[0]}`;
-      const empresa = `${nameBase}${suffix} ${bairroObj.nome.split(" ")[0]}`;
-      const instagram = `@${nameBase.toLowerCase().replace(/[^a-z0-9]/g, "")}.${cidade.toLowerCase().replace(/[^a-z]/g, "").slice(0, 3)}`;
-
-      leads.push({
-        id: String(id++),
-        empresa,
-        segmento: nicho,
-        bairro: bairroObj.nome,
-        cidade,
-        telefone: generatePhone(ddd),
-        instagram,
-        potencial: pickPotencial(),
-        temperatura: "frio",
-        status: "novo",
-        ultimoContato: "",
-        proximaAcao: "",
-        responsavel: "",
-        observacoes: "",
-        descricao: DESCRICOES[nicho],
-        motivoRecorrencia: MOTIVOS[nicho],
-        historico: [],
-        lat: bairroObj.coords[0] + (Math.random() - 0.5) * 0.015,
-        lng: bairroObj.coords[1] + (Math.random() - 0.5) * 0.015,
-      });
-    }
-  }
-
-  return leads;
+    return {
+      id: String(idx + 1),
+      empresa: raw.empresa || "",
+      segmento: nicho,
+      bairro: raw.bairro || bairroObj?.nome || "",
+      cidade,
+      telefone: raw.telefone || generatePhone(CIDADE_DDD[cidade]),
+      instagram: raw.instagram || "",
+      potencial: pickPotencial(),
+      temperatura: "frio" as LeadTemperature,
+      status: "novo" as LeadStatus,
+      ultimoContato: "",
+      proximaAcao: "",
+      responsavel: "",
+      observacoes: "",
+      descricao: raw.descricao || DESCRICOES[nicho] || "",
+      motivoRecorrencia: MOTIVOS[nicho] || "",
+      historico: [],
+      lat: bairroObj ? bairroObj.coords[0] + (Math.random() - 0.5) * 0.015 : undefined,
+      lng: bairroObj ? bairroObj.coords[1] + (Math.random() - 0.5) * 0.015 : undefined,
+    };
+  });
 }
 
-const MOCK_LEADS: Lead[] = generateLeads();
+const MOCK_LEADS: Lead[] = buildLeadsFromAI();
 
 export function getInitialLeads(): Lead[] {
-  const stored = localStorage.getItem("crm_leads_v6");
+  const stored = localStorage.getItem("crm_leads_v7");
   if (stored) {
     try { return JSON.parse(stored); } catch { /* fall through */ }
   }
@@ -278,7 +249,7 @@ export function getInitialLeads(): Lead[] {
 }
 
 export function saveLeads(leads: Lead[]) {
-  localStorage.setItem("crm_leads_v6", JSON.stringify(leads));
+  localStorage.setItem("crm_leads_v7", JSON.stringify(leads));
 }
 
 // ===== ACTIVITY LOG =====
