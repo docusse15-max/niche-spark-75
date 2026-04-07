@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleMap, useJsApiLoader, MarkerF, DirectionsRenderer, InfoWindowF } from "@react-google-maps/api";
 import { getInitialLeads, Lead, NICHOS, type Nicho, type LeadTemperature, type LeadStatus, STATUS_LABELS } from "@/data/leads";
-import { CIDADES, type Cidade } from "@/data/cities";
+import { CIDADES, CIDADE_CONFIGS, type Cidade } from "@/data/cities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
@@ -247,7 +247,18 @@ export default function RoutePlanner() {
                 <div className="space-y-2">
                   <div>
                     <label className="text-[10px] text-muted-foreground">Cidade</label>
-                    <Select value={filterCidade} onValueChange={setFilterCidade}>
+                    <Select value={filterCidade} onValueChange={(val) => {
+                      setFilterCidade(val);
+                      // Auto-center on city
+                      if (val !== "todas" && CIDADE_CONFIGS[val as Cidade]) {
+                        const [lat, lng] = CIDADE_CONFIGS[val as Cidade].center;
+                        setOrigin({ lat, lng });
+                        setAddress(`Centro, ${val} - MS`);
+                        setDirections(null);
+                        setSelectedRoute([]);
+                        toast({ title: `Mapa centralizado em ${val}` });
+                      }
+                    }}>
                       <SelectTrigger className="h-7 text-xs"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="todas">Todas as cidades</SelectItem>
