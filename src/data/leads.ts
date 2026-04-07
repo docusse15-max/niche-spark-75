@@ -177,11 +177,10 @@ const MOTIVOS: Record<Nicho, string> = {
 };
 
 function generatePhone(ddd: string): string {
-  const mid = ["99", "98", "97", "96"];
-  const m = mid[Math.floor(Math.random() * mid.length)];
-  const n1 = String(Math.floor(Math.random() * 900) + 100);
+  // WhatsApp BR: (DDD) 9 XXXX-XXXX — always starts with 9, 9 digits total
+  const n1 = String(Math.floor(Math.random() * 9000) + 1000);
   const n2 = String(Math.floor(Math.random() * 9000) + 1000);
-  return `(${ddd}) ${m}${n1}-${n2}`;
+  return `(${ddd}) 9${n1}-${n2}`;
 }
 
 const CIDADE_DDD: Record<Cidade, string> = {
