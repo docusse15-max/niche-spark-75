@@ -4,12 +4,15 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
 import Index from "./pages/Index.tsx";
 import CRM from "./pages/CRM.tsx";
 import ActivityLog from "./pages/ActivityLog.tsx";
 import LoginScreen from "./pages/LoginScreen.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import RoutePlanner from "./pages/RoutePlanner.tsx";
+import ComercialEvolution from "./pages/ComercialEvolution.tsx";
 
 const queryClient = new QueryClient();
 
@@ -30,19 +33,37 @@ const App = () => {
     );
   }
 
+  const handleLogout = () => {
+    sessionStorage.removeItem("crm_user");
+    setCurrentUser(null);
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<CRM currentUser={currentUser} onLogout={() => { sessionStorage.removeItem("crm_user"); setCurrentUser(null); }} />} />
-            <Route path="/log" element={<ActivityLog />} />
-            <Route path="/landing" element={<Index />} />
-            <Route path="/roteiro" element={<RoutePlanner />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <SidebarProvider>
+            <div className="min-h-screen flex w-full">
+              <AppSidebar currentUser={currentUser} onLogout={handleLogout} />
+              <div className="flex-1 flex flex-col min-w-0">
+                <header className="h-10 flex items-center border-b border-border px-2 shrink-0">
+                  <SidebarTrigger />
+                </header>
+                <main className="flex-1 overflow-auto">
+                  <Routes>
+                    <Route path="/" element={<CRM currentUser={currentUser} onLogout={handleLogout} />} />
+                    <Route path="/evolucao" element={<ComercialEvolution />} />
+                    <Route path="/log" element={<ActivityLog />} />
+                    <Route path="/landing" element={<Index />} />
+                    <Route path="/roteiro" element={<RoutePlanner />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </main>
+              </div>
+            </div>
+          </SidebarProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
