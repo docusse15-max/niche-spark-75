@@ -99,7 +99,7 @@ export default function RoutePlanner() {
         travelMode: google.maps.TravelMode.DRIVING,
       });
 
-      if (result.status === "OK") {
+      if (result.routes && result.routes.length > 0) {
         const order = result.routes[0].waypoint_order;
         const ordered = order.map(i => nearbyLeads[i]);
         setSelectedRoute(ordered);

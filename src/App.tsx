@@ -9,6 +9,7 @@ import CRM from "./pages/CRM.tsx";
 import ActivityLog from "./pages/ActivityLog.tsx";
 import LoginScreen from "./pages/LoginScreen.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import RoutePlanner from "./pages/RoutePlanner.tsx";
 
 const queryClient = new QueryClient();
 
