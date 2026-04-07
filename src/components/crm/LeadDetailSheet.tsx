@@ -222,6 +222,14 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDele
             )}
           </div>
 
+          {/* Registrar Visita */}
+          <div className="bg-accent/50 border border-border rounded-lg p-3">
+            <h4 className="font-semibold text-sm mb-2 text-foreground">📍 Registrar Visita</h4>
+            <Button size="sm" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold" onClick={() => setVisitDialogOpen(true)}>
+              <CalendarCheck className="h-4 w-4 mr-1" />Registrar Visita
+            </Button>
+          </div>
+
           <div>
             <h4 className="font-semibold text-sm mb-2 text-foreground">✏️ Nova anotação</h4>
             <div className="flex gap-2 mb-2">
