@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Lead, STATUS_LABELS, SCRIPTS } from "@/data/leads";
-import { Phone, Instagram, MapPin, Building, MessageSquare, Copy, User, Trash2, Navigation, Globe, Star } from "lucide-react";
+import { Phone, Instagram, MapPin, Building, MessageSquare, Copy, User, Trash2, Navigation, Globe, Star, CalendarCheck } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-
+import { supabase } from "@/integrations/supabase/client";
 interface LeadDetailSheetProps {
   lead: Lead | null;
   open: boolean;
@@ -35,6 +36,11 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDele
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
   const [deleteError, setDeleteError] = useState("");
+  const [visitDialogOpen, setVisitDialogOpen] = useState(false);
+  const [visitComercial, setVisitComercial] = useState("");
+  const [visitNotas, setVisitNotas] = useState("");
+  const [visitStatus, setVisitStatus] = useState("pendente");
+  const [savingVisit, setSavingVisit] = useState(false);
 
   if (!lead) return null;
 
@@ -60,6 +66,34 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDele
     if (!note.trim() || !author.trim()) return;
     onAddNote(lead.id, note, author);
     setNote("");
+  };
+
+  const handleRegisterVisit = async () => {
+    if (!visitComercial.trim()) return;
+    setSavingVisit(true);
+    try {
+      const { error } = await supabase.from("visitas").insert({
+        lead_id: lead.id,
+        lead_empresa: lead.empresa,
+        comercial: visitComercial,
+        data_visita: new Date().toISOString(),
+        status: visitStatus,
+        notas: visitNotas || "",
+        endereco: lead.endereco || `${lead.bairro} - ${lead.cidade}`,
+        lat: lead.lat || null,
+        lng: lead.lng || null,
+      });
+      if (error) throw error;
+      toast({ title: "Visita registrada!", description: `Status: ${visitStatus}` });
+      setVisitDialogOpen(false);
+      setVisitComercial("");
+      setVisitNotas("");
+      setVisitStatus("pendente");
+    } catch (e: any) {
+      toast({ title: "Erro ao registrar visita", description: e.message, variant: "destructive" });
+    } finally {
+      setSavingVisit(false);
+    }
   };
 
   return (
@@ -188,6 +222,14 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDele
             )}
           </div>
 
+          {/* Registrar Visita */}
+          <div className="bg-accent/50 border border-border rounded-lg p-3">
+            <h4 className="font-semibold text-sm mb-2 text-foreground">📍 Registrar Visita</h4>
+            <Button size="sm" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold" onClick={() => setVisitDialogOpen(true)}>
+              <CalendarCheck className="h-4 w-4 mr-1" />Registrar Visita
+            </Button>
+          </div>
+
           <div>
             <h4 className="font-semibold text-sm mb-2 text-foreground">✏️ Nova anotação</h4>
             <div className="flex gap-2 mb-2">
@@ -215,6 +257,46 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDele
             </Button>
           </div>
         </div>
+
+        <Dialog open={visitDialogOpen} onOpenChange={setVisitDialogOpen}>
+          <DialogContent className="bg-card border-border">
+            <DialogHeader>
+              <DialogTitle className="text-foreground">📍 Registrar Visita — {lead.empresa}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium text-foreground">Comercial *</label>
+                <Input placeholder="Nome do comercial..." value={visitComercial} onChange={e => setVisitComercial(e.target.value)} className="bg-secondary border-border mt-1" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground">Status da visita</label>
+                <Select value={visitStatus} onValueChange={setVisitStatus}>
+                  <SelectTrigger className="bg-secondary border-border mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pendente">⏳ Pendente</SelectItem>
+                    <SelectItem value="em_visita">📍 Em visita</SelectItem>
+                    <SelectItem value="finalizado">✅ Finalizado</SelectItem>
+                    <SelectItem value="interessado">🔥 Interessado</SelectItem>
+                    <SelectItem value="nao_interessado">❌ Não interessado</SelectItem>
+                    <SelectItem value="voltar_depois">🔄 Voltar depois</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground">Observações</label>
+                <Textarea placeholder="Detalhes da visita..." value={visitNotas} onChange={e => setVisitNotas(e.target.value)} className="bg-secondary border-border mt-1" rows={3} />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setVisitDialogOpen(false)}>Cancelar</Button>
+              <Button onClick={handleRegisterVisit} disabled={!visitComercial.trim() || savingVisit} className="bg-primary text-primary-foreground">
+                {savingVisit ? "Salvando..." : "Registrar Visita"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <DialogContent className="bg-card border-border">
