@@ -1,4 +1,4 @@
-import { LayoutDashboard, Route, ScrollText, TrendingUp, LogOut, User, CalendarDays } from "lucide-react";
+import { LayoutDashboard, Route, ScrollText, TrendingUp, LogOut, User, CalendarDays, ExternalLink } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
