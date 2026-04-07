@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 
 const GOOGLE_MAPS_KEY = "AIzaSyAPHdxmB8MWTBHHulY7YKjWpf7l5clpUps";
 const containerStyle = { width: "100%", height: "500px" };
-const defaultCenter = { lat: -20.47, lng: -54.62 };
+const defaultCenter = { lat: -18.5, lng: -52.0 };
 
 function getHeatColor(nivel: string, valorM2: number, maxValorM2: number): string {
   const ratio = valorM2 / maxValorM2;
