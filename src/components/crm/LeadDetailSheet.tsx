@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Lead, STATUS_LABELS, SCRIPTS } from "@/data/leads";
-import { Phone, Instagram, MapPin, Building, MessageSquare, Copy, User, Trash2 } from "lucide-react";
+import { Phone, Instagram, MapPin, Building, MessageSquare, Copy, User, Trash2, Navigation, Globe, Star } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
@@ -91,11 +91,54 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDele
               </p>
               <p className="flex items-center gap-2 text-foreground"><Instagram className="h-4 w-4 text-muted-foreground" />{lead.instagram}</p>
             </div>
+
+            {/* Rating */}
+            {lead.avaliacao && (
+              <div className="flex items-center gap-1 mt-2">
+                <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                <span className="text-sm font-medium text-foreground">{lead.avaliacao}</span>
+                <span className="text-xs text-muted-foreground">({lead.totalAvaliacoes} avaliações)</span>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-2 mt-3">
+              {lead.googleMapsUrl && (
+                <a href={lead.googleMapsUrl} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-md bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 text-xs font-medium transition-colors">
+                  <MapPin className="h-3.5 w-3.5 mr-1" />Google Maps
+                </a>
+              )}
+              {lead.lat && lead.lng && (
+                <a href={`https://waze.com/ul?ll=${lead.lat},${lead.lng}&navigate=yes`} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-md bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1.5 text-xs font-medium transition-colors">
+                  <Navigation className="h-3.5 w-3.5 mr-1" />Waze
+                </a>
+              )}
+              {lead.website && (
+                <a href={lead.website} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-md bg-secondary hover:bg-secondary/80 text-foreground px-3 py-1.5 text-xs font-medium transition-colors border border-border">
+                  <Globe className="h-3.5 w-3.5 mr-1" />Site
+                </a>
+              )}
+            </div>
           </div>
+
+          {/* Photos */}
+          {lead.fotos && lead.fotos.length > 0 && (
+            <div>
+              <h4 className="font-semibold text-sm mb-2 text-foreground">📸 Fotos do estabelecimento</h4>
+              <div className="grid grid-cols-3 gap-2">
+                {lead.fotos.map((url, i) => (
+                  <img key={i} src={url} alt={`${lead.empresa} foto ${i + 1}`} className="w-full h-24 object-cover rounded-lg border border-border" loading="lazy" />
+                ))}
+              </div>
+            </div>
+          )}
 
           <div>
             <h4 className="font-semibold text-sm mb-1 text-foreground">Sobre o negócio</h4>
-            <p className="text-sm text-muted-foreground">{lead.descricao}</p>
+            <p className="text-sm text-muted-foreground">{lead.descricao || lead.endereco}</p>
           </div>
 
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-3">

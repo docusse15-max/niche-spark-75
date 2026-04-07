@@ -60,6 +60,12 @@ export interface Lead {
   historico: LeadInteraction[];
   lat?: number;
   lng?: number;
+  googleMapsUrl?: string;
+  fotos?: string[];
+  endereco?: string;
+  avaliacao?: number | null;
+  totalAvaliacoes?: number;
+  website?: string;
 }
 
 export const STATUS_LABELS: Record<LeadStatus, string> = {
