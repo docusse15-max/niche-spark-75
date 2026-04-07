@@ -196,6 +196,41 @@ export default function VisitCalendar() {
         </Card>
       )}
 
+      {/* Registros por comercial */}
+      {visitas.length > 0 && (() => {
+        const countByComercial = new Map<string, { total: number; pendente: number; realizada: number; cancelada: number }>();
+        visitas.forEach(v => {
+          if (!countByComercial.has(v.comercial)) countByComercial.set(v.comercial, { total: 0, pendente: 0, realizada: 0, cancelada: 0 });
+          const c = countByComercial.get(v.comercial)!;
+          c.total++;
+          if (v.status === "pendente") c.pendente++;
+          else if (v.status === "realizada") c.realizada++;
+          else if (v.status === "cancelada") c.cancelada++;
+        });
+        return (
+          <Card>
+            <CardContent className="p-3">
+              <p className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1">
+                <User className="h-3.5 w-3.5" /> Registros por Comercial
+              </p>
+              <div className="flex flex-wrap gap-3">
+                {Array.from(countByComercial.entries())
+                  .sort((a, b) => b[1].total - a[1].total)
+                  .map(([nome, c]) => (
+                    <div key={nome} className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5">
+                      <span className="text-xs font-medium">{nome}</span>
+                      <Badge variant="secondary" className="text-[10px] h-5">{c.total}</Badge>
+                      {c.realizada > 0 && <span className="text-[10px] text-emerald-400">✓{c.realizada}</span>}
+                      {c.pendente > 0 && <span className="text-[10px] text-amber-400">⏳{c.pendente}</span>}
+                      {c.cancelada > 0 && <span className="text-[10px] text-red-400">✕{c.cancelada}</span>}
+                    </div>
+                  ))}
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })()}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Calendar */}
         <Card className="lg:col-span-2">
