@@ -135,6 +135,10 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDele
               </div>
             </div>
           )}
+
+          <div>
+            <h4 className="font-semibold text-sm mb-1 text-foreground">Sobre o negócio</h4>
+            <p className="text-sm text-muted-foreground">{lead.descricao || lead.endereco}</p>
           </div>
 
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-3">
