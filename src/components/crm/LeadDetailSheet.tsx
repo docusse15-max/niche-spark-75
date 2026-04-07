@@ -258,6 +258,46 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDele
           </div>
         </div>
 
+        <Dialog open={visitDialogOpen} onOpenChange={setVisitDialogOpen}>
+          <DialogContent className="bg-card border-border">
+            <DialogHeader>
+              <DialogTitle className="text-foreground">📍 Registrar Visita — {lead.empresa}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium text-foreground">Comercial *</label>
+                <Input placeholder="Nome do comercial..." value={visitComercial} onChange={e => setVisitComercial(e.target.value)} className="bg-secondary border-border mt-1" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground">Status da visita</label>
+                <Select value={visitStatus} onValueChange={setVisitStatus}>
+                  <SelectTrigger className="bg-secondary border-border mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pendente">⏳ Pendente</SelectItem>
+                    <SelectItem value="em_visita">📍 Em visita</SelectItem>
+                    <SelectItem value="finalizado">✅ Finalizado</SelectItem>
+                    <SelectItem value="interessado">🔥 Interessado</SelectItem>
+                    <SelectItem value="nao_interessado">❌ Não interessado</SelectItem>
+                    <SelectItem value="voltar_depois">🔄 Voltar depois</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground">Observações</label>
+                <Textarea placeholder="Detalhes da visita..." value={visitNotas} onChange={e => setVisitNotas(e.target.value)} className="bg-secondary border-border mt-1" rows={3} />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setVisitDialogOpen(false)}>Cancelar</Button>
+              <Button onClick={handleRegisterVisit} disabled={!visitComercial.trim() || savingVisit} className="bg-primary text-primary-foreground">
+                {savingVisit ? "Salvando..." : "Registrar Visita"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <DialogContent className="bg-card border-border">
             <DialogHeader>
