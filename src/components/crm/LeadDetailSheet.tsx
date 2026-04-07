@@ -68,6 +68,34 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDele
     setNote("");
   };
 
+  const handleRegisterVisit = async () => {
+    if (!visitComercial.trim()) return;
+    setSavingVisit(true);
+    try {
+      const { error } = await supabase.from("visitas").insert({
+        lead_id: lead.id,
+        lead_empresa: lead.empresa,
+        comercial: visitComercial,
+        data_visita: new Date().toISOString(),
+        status: visitStatus,
+        notas: visitNotas || "",
+        endereco: lead.endereco || `${lead.bairro} - ${lead.cidade}`,
+        lat: lead.lat || null,
+        lng: lead.lng || null,
+      });
+      if (error) throw error;
+      toast({ title: "Visita registrada!", description: `Status: ${visitStatus}` });
+      setVisitDialogOpen(false);
+      setVisitComercial("");
+      setVisitNotas("");
+      setVisitStatus("pendente");
+    } catch (e: any) {
+      toast({ title: "Erro ao registrar visita", description: e.message, variant: "destructive" });
+    } finally {
+      setSavingVisit(false);
+    }
+  };
+
   return (
     <Sheet open={open} onOpenChange={onClose}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto bg-card border-border">
