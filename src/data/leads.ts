@@ -208,7 +208,7 @@ function buildLeadsFromAI(): Lead[] {
       segmento: nicho,
       bairro: raw.bairro || bairroObj?.nome || "",
       cidade,
-      telefone: raw.telefone || generatePhone(CIDADE_DDD[cidade]),
+      telefone: raw.telefone || "",
       instagram: raw.instagram || "",
       potencial: pickPotencial(),
       temperatura: "frio" as LeadTemperature,
@@ -220,8 +220,14 @@ function buildLeadsFromAI(): Lead[] {
       descricao: raw.descricao || DESCRICOES[nicho] || "",
       motivoRecorrencia: MOTIVOS[nicho] || "",
       historico: [],
-      lat: bairroObj ? bairroObj.coords[0] + (Math.random() - 0.5) * 0.015 : undefined,
-      lng: bairroObj ? bairroObj.coords[1] + (Math.random() - 0.5) * 0.015 : undefined,
+      lat: raw.lat || (bairroObj ? bairroObj.coords[0] + (Math.random() - 0.5) * 0.015 : undefined),
+      lng: raw.lng || (bairroObj ? bairroObj.coords[1] + (Math.random() - 0.5) * 0.015 : undefined),
+      googleMapsUrl: raw.googleMapsUrl || undefined,
+      fotos: raw.fotos || [],
+      endereco: raw.endereco || "",
+      avaliacao: raw.avaliacao || null,
+      totalAvaliacoes: raw.totalAvaliacoes || 0,
+      website: raw.website || "",
     };
   });
 }
@@ -229,7 +235,7 @@ function buildLeadsFromAI(): Lead[] {
 const MOCK_LEADS: Lead[] = buildLeadsFromAI();
 
 export function getInitialLeads(): Lead[] {
-  const stored = localStorage.getItem("crm_leads_v8");
+  const stored = localStorage.getItem("crm_leads_v9");
   if (stored) {
     try { return JSON.parse(stored); } catch { /* fall through */ }
   }
@@ -237,7 +243,7 @@ export function getInitialLeads(): Lead[] {
 }
 
 export function saveLeads(leads: Lead[]) {
-  localStorage.setItem("crm_leads_v8", JSON.stringify(leads));
+  localStorage.setItem("crm_leads_v9", JSON.stringify(leads));
 }
 
 // ===== ACTIVITY LOG =====
