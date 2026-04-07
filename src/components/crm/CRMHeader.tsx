@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Lead } from "@/data/leads";
-import { RefreshCw, Plus, Download, Users, UserPlus, Phone, CalendarCheck, FileText, Trophy, Search } from "lucide-react";
+import { RefreshCw, Plus, Download, Users, UserPlus, Phone, CalendarCheck, FileText, Trophy, MapPin } from "lucide-react";
 import logoVfmoney from "@/assets/logo-vfmoney.png";
 
 interface CRMHeaderProps {
@@ -34,7 +34,7 @@ export default function CRMHeader({ leads, onNewLead, onRefresh, onExport, onSea
         </div>
         <div className="flex gap-2 flex-wrap">
           <Button variant="outline" size="sm" onClick={onRefresh} className="border-border hover:border-primary hover:text-primary"><RefreshCw className="h-4 w-4 mr-1" />Atualizar</Button>
-          <Button size="sm" onClick={onSearchLeads} className="gold-gradient text-background font-semibold hover:opacity-90"><Search className="h-4 w-4 mr-1" />Buscar com IA</Button>
+          <Button size="sm" onClick={onSearchLeads} className="gold-gradient text-background font-semibold hover:opacity-90"><MapPin className="h-4 w-4 mr-1" />Buscar no Google</Button>
           <Button size="sm" onClick={onNewLead} className="gold-gradient text-background font-semibold hover:opacity-90"><Plus className="h-4 w-4 mr-1" />Novo Lead</Button>
           <Button variant="outline" size="sm" onClick={onExport} className="border-border hover:border-primary hover:text-primary"><Download className="h-4 w-4 mr-1" />Exportar</Button>
         </div>
