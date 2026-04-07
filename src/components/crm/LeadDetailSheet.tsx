@@ -36,6 +36,11 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDele
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
   const [deleteError, setDeleteError] = useState("");
+  const [visitDialogOpen, setVisitDialogOpen] = useState(false);
+  const [visitComercial, setVisitComercial] = useState("");
+  const [visitNotas, setVisitNotas] = useState("");
+  const [visitStatus, setVisitStatus] = useState("pendente");
+  const [savingVisit, setSavingVisit] = useState(false);
 
   if (!lead) return null;
 
