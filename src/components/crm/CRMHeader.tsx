@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Lead } from "@/data/leads";
-import { RefreshCw, Plus, Download, Users, UserPlus, Phone, CalendarCheck, FileText, Trophy } from "lucide-react";
+import { RefreshCw, Plus, Download, Users, UserPlus, Phone, CalendarCheck, FileText, Trophy, Search } from "lucide-react";
 import logoVfmoney from "@/assets/logo-vfmoney.png";
 
 interface CRMHeaderProps {
@@ -8,9 +8,10 @@ interface CRMHeaderProps {
   onNewLead: () => void;
   onRefresh: () => void;
   onExport: () => void;
+  onSearchLeads: () => void;
 }
 
-export default function CRMHeader({ leads, onNewLead, onRefresh, onExport }: CRMHeaderProps) {
+export default function CRMHeader({ leads, onNewLead, onRefresh, onExport, onSearchLeads }: CRMHeaderProps) {
   const stats = [
     { label: "Total de Leads", value: leads.length, icon: Users, accent: false },
     { label: "Novos", value: leads.filter(l => l.status === "novo").length, icon: UserPlus, accent: true },
@@ -33,6 +34,7 @@ export default function CRMHeader({ leads, onNewLead, onRefresh, onExport }: CRM
         </div>
         <div className="flex gap-2 flex-wrap">
           <Button variant="outline" size="sm" onClick={onRefresh} className="border-border hover:border-primary hover:text-primary"><RefreshCw className="h-4 w-4 mr-1" />Atualizar</Button>
+          <Button size="sm" onClick={onSearchLeads} className="gold-gradient text-background font-semibold hover:opacity-90"><Search className="h-4 w-4 mr-1" />Buscar com IA</Button>
           <Button size="sm" onClick={onNewLead} className="gold-gradient text-background font-semibold hover:opacity-90"><Plus className="h-4 w-4 mr-1" />Novo Lead</Button>
           <Button variant="outline" size="sm" onClick={onExport} className="border-border hover:border-primary hover:text-primary"><Download className="h-4 w-4 mr-1" />Exportar</Button>
         </div>
