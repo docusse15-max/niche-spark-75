@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { Lead, LeadStatus, getInitialLeads, saveLeads, addActivityLog } from "@/data/leads";
 import CRMHeader from "@/components/crm/CRMHeader";
-import CRMFilters, { Filters } from "@/components/crm/CRMFilters";
+import CRMFilters, { Filters, extractBairroName } from "@/components/crm/CRMFilters";
 import HeatMap from "@/components/crm/HeatMap";
 import LeadsTable from "@/components/crm/LeadsTable";
 import LeadDetailSheet from "@/components/crm/LeadDetailSheet";
@@ -43,7 +43,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
     return leads.filter(l => {
       if (filters.search && !l.empresa.toLowerCase().includes(filters.search.toLowerCase())) return false;
       if (filters.nicho && l.segmento !== filters.nicho) return false;
-      if (filters.bairro && l.bairro !== filters.bairro) return false;
+      if (filters.bairro && extractBairroName(l.bairro) !== filters.bairro) return false;
       if (filters.cidade && l.cidade !== filters.cidade) return false;
       if (filters.temperatura && l.temperatura !== filters.temperatura) return false;
       if (filters.status && l.status !== filters.status) return false;

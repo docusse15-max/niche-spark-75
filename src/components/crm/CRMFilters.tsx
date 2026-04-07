@@ -3,9 +3,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { NICHOS, RESPONSAVEIS } from "@/data/leads";
-import { CIDADES, CIDADE_CONFIGS, type Cidade } from "@/data/cities";
-import { X, Search, Filter, SlidersHorizontal } from "lucide-react";
+import { NICHOS, RESPONSAVEIS, getInitialLeads } from "@/data/leads";
+import { CIDADES } from "@/data/cities";
+import { X, Search, SlidersHorizontal } from "lucide-react";
 
 export interface Filters {
   search: string;
@@ -23,10 +23,21 @@ interface CRMFiltersProps {
   onChange: (f: Filters) => void;
 }
 
+/** Extract clean bairro name from address-style strings like "380 - Vila Vilas Boas" */
+function extractBairroName(bairro: string): string {
+  if (!bairro) return "";
+  const parts = bairro.split(" - ");
+  if (parts.length >= 2) {
+    return parts[parts.length - 1].trim();
+  }
+  return bairro.trim();
+}
+
+export { extractBairroName };
+
 export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
   const set = (key: keyof Filters, val: string) => {
     const updated = { ...filters, [key]: val === "all" ? "" : val };
-    // Reset bairro when city changes
     if (key === "cidade") updated.bairro = "";
     onChange(updated);
   };
@@ -34,24 +45,20 @@ export default function CRMFilters({ filters, onChange }: CRMFiltersProps) {
   const activeCount = Object.entries(filters).filter(([k, v]) => v !== "" && k !== "search").length;
   const hasFilters = Object.values(filters).some(v => v !== "");
 
-  // Dynamic bairros based on selected city
+  // Build bairro options from actual lead data, filtered by city
   const bairrosOptions = useMemo(() => {
-    if (!filters.cidade) {
-      // Show all bairros from all cities
-      const all = new Set<string>();
-      for (const cidade of CIDADES) {
-        for (const b of CIDADE_CONFIGS[cidade].bairros) {
-          all.add(b.nome);
-        }
-      }
-      return Array.from(all).sort();
+    const leads = getInitialLeads();
+    const bairroSet = new Set<string>();
+    for (const lead of leads) {
+      if (filters.cidade && lead.cidade !== filters.cidade) continue;
+      const name = extractBairroName(lead.bairro);
+      if (name && name !== "MS") bairroSet.add(name);
     }
-    return CIDADE_CONFIGS[filters.cidade as Cidade]?.bairros.map(b => b.nome).sort() || [];
+    return Array.from(bairroSet).sort();
   }, [filters.cidade]);
 
   return (
     <div className="space-y-2">
-      {/* Main filter row */}
       <div className="flex flex-wrap gap-2 items-center p-3 bg-card rounded-lg border border-border">
         <div className="flex items-center gap-1.5 text-muted-foreground mr-1">
           <SlidersHorizontal className="h-4 w-4" />
