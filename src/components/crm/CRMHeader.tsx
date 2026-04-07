@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Lead } from "@/data/leads";
-import { RefreshCw, Plus, Download, Users, UserPlus, Phone, CalendarCheck, FileText, Trophy, MapPin } from "lucide-react";
+import { RefreshCw, Plus, Download, Users, UserPlus, Phone, CalendarCheck, FileText, Trophy, MapPin, Sparkles } from "lucide-react";
 import logoVfmoney from "@/assets/logo-vfmoney.png";
 
 interface CRMHeaderProps {
@@ -9,6 +9,8 @@ interface CRMHeaderProps {
   onRefresh: () => void;
   onExport: () => void;
   onSearchLeads: () => void;
+  belezaFilter?: boolean;
+  onToggleBeleza?: () => void;
 }
 
 export default function CRMHeader({ leads, onNewLead, onRefresh, onExport, onSearchLeads }: CRMHeaderProps) {
