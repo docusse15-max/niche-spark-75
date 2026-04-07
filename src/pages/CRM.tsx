@@ -31,15 +31,18 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
   const [newLeadOpen, setNewLeadOpen] = useState(false);
   const [searchLeadsOpen, setSearchLeadsOpen] = useState(false);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
-  
+  const [belezaFilter, setBelezaFilter] = useState(false);
 
   const persist = useCallback((updated: Lead[]) => {
     setLeads(updated);
     saveLeads(updated);
   }, []);
 
+  const BELEZA_NICHOS = ["Salão de Beleza", "Clínica de Estética"];
+
   const filteredLeads = useMemo(() => {
     return leads.filter(l => {
+      if (belezaFilter && !BELEZA_NICHOS.includes(l.segmento)) return false;
       if (filters.search && !l.empresa.toLowerCase().includes(filters.search.toLowerCase())) return false;
       if (filters.nicho && l.segmento !== filters.nicho) return false;
       if (filters.bairro && extractBairroName(l.bairro) !== filters.bairro) return false;
@@ -51,7 +54,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
       if (filters.responsavel && filters.responsavel !== "sem_responsavel" && l.responsavel !== filters.responsavel) return false;
       return true;
     });
-  }, [leads, filters]);
+  }, [leads, filters, belezaFilter]);
 
   const handleSelectLead = (lead: Lead) => {
     setSelectedLead(lead);
@@ -142,7 +145,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
       <div className="max-w-[1400px] mx-auto px-4 py-4 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <CRMHeader leads={leads} onNewLead={() => setNewLeadOpen(true)} onRefresh={() => { persist(getInitialLeads()); toast({ title: "Base atualizada" }); }} onExport={handleExport} onSearchLeads={() => setSearchLeadsOpen(true)} />
+            <CRMHeader leads={leads} onNewLead={() => setNewLeadOpen(true)} onRefresh={() => { persist(getInitialLeads()); toast({ title: "Base atualizada" }); }} onExport={handleExport} onSearchLeads={() => setSearchLeadsOpen(true)} belezaFilter={belezaFilter} onToggleBeleza={() => setBelezaFilter(v => !v)} />
           </div>
         </div>
         <div className="flex items-center justify-between">
