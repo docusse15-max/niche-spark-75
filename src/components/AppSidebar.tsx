@@ -1,4 +1,4 @@
-import { LayoutDashboard, Route, ScrollText, TrendingUp, LogOut, User, CalendarDays } from "lucide-react";
+import { LayoutDashboard, Route, ScrollText, TrendingUp, LogOut, User, CalendarDays, ExternalLink } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -57,6 +57,29 @@ export function AppSidebar({ currentUser, onLogout }: AppSidebarProps) {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-xs text-muted-foreground">
+            {!collapsed && "Portais"}
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a
+                    href="https://facilita.vfbankdigital.com.br/auth/login"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:bg-muted/50 flex items-center"
+                  >
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    {!collapsed && <span>Portal Recorrência</span>}
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
