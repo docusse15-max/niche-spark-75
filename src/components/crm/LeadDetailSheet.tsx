@@ -115,7 +115,7 @@ export default function LeadDetailSheet({ lead, open, onClose, onAddNote, onDele
               <p className="flex items-center gap-2 text-foreground">
                 <Phone className="h-4 w-4 text-muted-foreground" />{lead.telefone}
                 <a
-                  href={`https://wa.me/55${lead.telefone.replace(/\D/g, "")}`}
+                  href={`https://wa.me/55${lead.telefone.replace(/\D/g, "")}?text=${encodeURIComponent(SCRIPTS.abertura.replace("[SEGMENTO]", lead.segmento).replace("[CIDADE]", lead.cidade))}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center rounded-md bg-green-600 hover:bg-green-700 text-white px-2 py-0.5 text-xs font-medium ml-1 transition-colors"
