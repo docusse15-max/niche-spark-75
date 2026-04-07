@@ -31,7 +31,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
   const [newLeadOpen, setNewLeadOpen] = useState(false);
   const [searchLeadsOpen, setSearchLeadsOpen] = useState(false);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
-  
+  const [belezaFilter, setBelezaFilter] = useState(false);
 
   const persist = useCallback((updated: Lead[]) => {
     setLeads(updated);
