@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { Lead, LeadStatus, getInitialLeads, saveLeads, addActivityLog } from "@/data/leads";
 import CRMHeader from "@/components/crm/CRMHeader";
-import CRMFilters, { Filters } from "@/components/crm/CRMFilters";
+import CRMFilters, { Filters, extractBairroName } from "@/components/crm/CRMFilters";
 import HeatMap from "@/components/crm/HeatMap";
 import LeadsTable from "@/components/crm/LeadsTable";
 import LeadDetailSheet from "@/components/crm/LeadDetailSheet";
