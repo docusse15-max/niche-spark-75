@@ -44,6 +44,51 @@ export type Database = {
         }
         Relationships: []
       }
+      visitas: {
+        Row: {
+          comercial: string
+          created_at: string
+          data_visita: string
+          duracao_min: number
+          endereco: string | null
+          id: string
+          lat: number | null
+          lead_empresa: string
+          lead_id: string
+          lng: number | null
+          notas: string | null
+          status: string
+        }
+        Insert: {
+          comercial: string
+          created_at?: string
+          data_visita: string
+          duracao_min?: number
+          endereco?: string | null
+          id?: string
+          lat?: number | null
+          lead_empresa: string
+          lead_id?: string
+          lng?: number | null
+          notas?: string | null
+          status?: string
+        }
+        Update: {
+          comercial?: string
+          created_at?: string
+          data_visita?: string
+          duracao_min?: number
+          endereco?: string | null
+          id?: string
+          lat?: number | null
+          lead_empresa?: string
+          lead_id?: string
+          lng?: number | null
+          notas?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
