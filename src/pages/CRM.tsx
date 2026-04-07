@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollText, LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const EMPTY_FILTERS: Filters = { search: "", nicho: "", bairro: "", cidade: "", temperatura: "", status: "" };
+const EMPTY_FILTERS: Filters = { search: "", nicho: "", bairro: "", cidade: "", temperatura: "", status: "", potencial: "", responsavel: "" };
 
 interface CRMProps {
   currentUser: string;
@@ -47,6 +47,8 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
       if (filters.cidade && l.cidade !== filters.cidade) return false;
       if (filters.temperatura && l.temperatura !== filters.temperatura) return false;
       if (filters.status && l.status !== filters.status) return false;
+      if (filters.potencial && l.potencial !== filters.potencial) return false;
+      if (filters.responsavel !== undefined && filters.responsavel !== "" && l.responsavel !== filters.responsavel) return false;
       return true;
     });
   }, [leads, filters]);
