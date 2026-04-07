@@ -31,7 +31,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
   const [newLeadOpen, setNewLeadOpen] = useState(false);
   const [searchLeadsOpen, setSearchLeadsOpen] = useState(false);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
-  const navigate = useNavigate();
+  
 
   const persist = useCallback((updated: Lead[]) => {
     setLeads(updated);
