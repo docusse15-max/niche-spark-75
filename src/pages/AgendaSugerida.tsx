@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { format, addDays } from "date-fns";
+import { format, addDays, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { getInitialLeads, Lead, COMERCIAIS, SALES_ARGUMENTS, SCRIPTS } from "@/data/leads";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
