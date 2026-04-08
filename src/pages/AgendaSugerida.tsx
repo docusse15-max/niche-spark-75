@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { format, addDays } from "date-fns";
+import { format, addDays, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { getInitialLeads, Lead, COMERCIAIS, SALES_ARGUMENTS, SCRIPTS } from "@/data/leads";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -100,7 +100,7 @@ function gerarAgendaSugerida(leads: Lead[], comercial: string): AgendaItem[] {
 }
 
 function gerarTextoEmail(comercial: string, agenda: AgendaItem[], dataAgenda: string): string {
-  const dataFormatada = format(new Date(dataAgenda), "EEEE, dd 'de' MMMM", { locale: ptBR });
+  const dataFormatada = format(parseISO(dataAgenda), "EEEE, dd 'de' MMMM", { locale: ptBR });
   const bairros = agruparPorBairro(agenda);
   const bairrosList = Object.keys(bairros);
 
@@ -272,7 +272,7 @@ export default function AgendaSugerida() {
       toast({ title: "Erro", description: "Informe o e-mail do destinatário.", variant: "destructive" });
       return;
     }
-    const subject = encodeURIComponent(`📋 Agenda de Visitas — ${selectedTab} — ${format(new Date(dataAgenda), "dd/MM/yyyy")}`);
+    const subject = encodeURIComponent(`📋 Agenda de Visitas — ${selectedTab} — ${format(parseISO(dataAgenda), "dd/MM/yyyy")}`);
     const body = encodeURIComponent(textoEmail);
     const cc = emailCc.length > 0 ? `&cc=${emailCc.join(",")}` : "";
     window.open(`mailto:${emailTo}?subject=${subject}&body=${body}${cc}`, "_blank");
@@ -304,7 +304,7 @@ export default function AgendaSugerida() {
           <div>
             <h1 className="text-xl font-bold">📋 Agenda Sugerida de Visitas</h1>
             <p className="text-sm text-muted-foreground">
-              {format(new Date(dataAgenda), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+              {format(parseISO(dataAgenda), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
             </p>
           </div>
         </div>
