@@ -20,6 +20,16 @@ import {
 
 const PASSWORD = "56239050";
 
+function safeParse(dateStr: string): Date {
+  if (!dateStr) return addDays(new Date(), 1);
+  const iso = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (iso) {
+    return new Date(parseInt(iso[1]), parseInt(iso[2]) - 1, parseInt(iso[3]));
+  }
+  const fallback = new Date(dateStr);
+  return isNaN(fallback.getTime()) ? addDays(new Date(), 1) : fallback;
+}
+
 interface AgendaItem {
   lead: Lead;
   horario: string;
