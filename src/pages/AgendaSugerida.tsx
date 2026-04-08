@@ -6,16 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import {
-  Lock, Mail, Send, Calendar, MapPin, User, Copy,
-  Building2, Phone, Plus, X, Eye, Route, Flame,
-  Clock, Target, Navigation, ArrowRight, Zap
+  Lock, Mail, Send, Calendar, User, Copy,
+  Phone, Plus, X, Eye, Route,
+  Target, Navigation, ArrowRight, Zap
 } from "lucide-react";
 
 const PASSWORD = "56239050";
@@ -46,6 +44,20 @@ function agruparPorBairro(items: AgendaItem[]): Record<string, AgendaItem[]> {
     groups[key].push(item);
   });
   return groups;
+}
+
+function normalizarLeadsPorComercial(leads: Lead[]): Lead[] {
+  return leads.map((lead, index) => ({
+    ...lead,
+    responsavel: lead.responsavel?.trim() || COMERCIAIS[index % COMERCIAIS.length],
+    temperatura: lead.temperatura || "frio",
+    status: lead.status || "novo",
+    potencial: lead.potencial || "medio",
+  }));
+}
+
+function emailPadraoDoComercial(comercial: string): string {
+  return `${comercial.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}@vfmoney.com.br`;
 }
 
 function gerarAgendaSugerida(leads: Lead[], comercial: string): AgendaItem[] {
@@ -203,12 +215,12 @@ export default function AgendaSugerida() {
   const [passwordError, setPasswordError] = useState(false);
 
   const [dataAgenda, setDataAgenda] = useState(format(addDays(new Date(), 1), "yyyy-MM-dd"));
-  const [emailTo, setEmailTo] = useState("");
+  const [emailTo, setEmailTo] = useState(emailPadraoDoComercial(COMERCIAIS[0]));
   const [emailCc, setEmailCc] = useState<string[]>([]);
   const [ccInput, setCcInput] = useState("");
   const [selectedTab, setSelectedTab] = useState<string>(COMERCIAIS[0]);
 
-  const leads = useMemo(() => getInitialLeads(), []);
+  const leads = useMemo(() => normalizarLeadsPorComercial(getInitialLeads()), []);
 
   // Auto-generate agendas for ALL comerciais
   const agendasPorComercial = useMemo(() => {
@@ -221,11 +233,18 @@ export default function AgendaSugerida() {
 
   const agendaAtual = agendasPorComercial[selectedTab] || [];
   const bairrosAgrupados = useMemo(() => agruparPorBairro(agendaAtual), [agendaAtual]);
+  const hasAgenda = agendaAtual.length > 0;
 
   const textoEmail = useMemo(() => {
     if (agendaAtual.length === 0) return "";
     return gerarTextoEmail(selectedTab, agendaAtual, dataAgenda);
   }, [selectedTab, agendaAtual, dataAgenda]);
+
+  const emailSugerido = useMemo(() => emailPadraoDoComercial(selectedTab), [selectedTab]);
+
+  useEffect(() => {
+    setEmailTo(prev => prev && prev !== emailPadraoDoComercial(COMERCIAIS[0]) && prev !== emailPadraoDoComercial(selectedTab) ? prev : emailSugerido);
+  }, [emailSugerido, selectedTab]);
 
   if (!authenticated) {
     return (
@@ -282,16 +301,23 @@ export default function AgendaSugerida() {
       toast({ title: "Erro", description: "Informe o e-mail do destinatário.", variant: "destructive" });
       return;
     }
+    if (!textoEmail.trim()) {
+      toast({ title: "Sem agenda", description: "Nenhuma agenda foi gerada para enviar.", variant: "destructive" });
+      return;
+    }
     const subject = encodeURIComponent(`📋 Agenda de Visitas — ${selectedTab} — ${format(safeParse(dataAgenda), "dd/MM/yyyy")}`);
     const body = encodeURIComponent(textoEmail);
     const cc = emailCc.length > 0 ? `&cc=${emailCc.join(",")}` : "";
-    window.open(`mailto:${emailTo}?subject=${subject}&body=${body}${cc}`, "_blank");
-    toast({ title: "E-mail aberto!", description: "Seu cliente de e-mail foi aberto com a agenda." });
+    window.location.href = `mailto:${emailTo}?subject=${subject}&body=${body}${cc}`;
+    toast({ title: "Cliente de e-mail aberto", description: "A agenda foi preparada para envio." });
   };
 
   const handleSendWhatsApp = () => {
-    const texto = textoEmail;
-    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
+    if (!textoEmail.trim()) {
+      toast({ title: "Sem agenda", description: "Nenhuma agenda foi gerada para compartilhar.", variant: "destructive" });
+      return;
+    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(textoEmail)}`, "_blank");
   };
 
   const prioridadeColor = {
@@ -304,6 +330,10 @@ export default function AgendaSugerida() {
   const totalMedias = agendaAtual.filter(a => a.prioridade === "media").length;
   const totalBaixas = agendaAtual.filter(a => a.prioridade === "baixa").length;
   const totalRegioes = Object.keys(bairrosAgrupados).length;
+
+  if (emailTo !== emailPadraoDoComercial(selectedTab) && emailTo) {
+    // preserve manual edits
+  }
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
@@ -355,10 +385,10 @@ export default function AgendaSugerida() {
       </div>
 
       {/* Content for selected comercial */}
-      {agendaAtual.length > 0 ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left: Route & Visits */}
-          <div className="lg:col-span-2 space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-4">
+          {hasAgenda ? (
+            <>
             {/* Priority summary */}
             <Card>
               <CardContent className="pt-4 pb-3">
@@ -443,10 +473,20 @@ export default function AgendaSugerida() {
                 ))}
               </CardContent>
             </Card>
-          </div>
+            </>
+          ) : (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Calendar className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
+                <p className="text-foreground font-medium">Nenhuma agenda encontrada para {selectedTab}.</p>
+                <p className="text-sm text-muted-foreground mt-1">Os leads sem responsável agora são distribuídos automaticamente entre os comerciais, mas este comercial ainda não tem visitas sugeridas suficientes.</p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
 
-          {/* Right: Email & Tips */}
-          <div className="space-y-4">
+        {/* Right: Email & Tips */}
+        <div className="space-y-4">
             {/* Quick tips */}
             <Card>
               <CardHeader className="pb-2">
@@ -486,9 +526,11 @@ export default function AgendaSugerida() {
                   <Label className="text-xs">E-mail do comercial</Label>
                   <Input
                     type="email" placeholder="comercial@empresa.com"
-                    value={emailTo} onChange={e => setEmailTo(e.target.value)}
+                    value={emailTo}
+                    onChange={e => setEmailTo(e.target.value)}
                     className="h-8 text-xs"
                   />
+                  <p className="text-[10px] text-muted-foreground">Sugestão automática: {emailSugerido}</p>
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Cópia (CC)</Label>
@@ -541,21 +583,15 @@ export default function AgendaSugerida() {
               <CardContent>
                 <ScrollArea className="h-[300px]">
                   <pre className="whitespace-pre-wrap text-[10px] bg-muted/30 p-3 rounded-lg border font-sans leading-relaxed">
-                    {textoEmail}
+                    {textoEmail || `A agenda deste comercial ainda não foi gerada.
+
+Preencha o e-mail acima e selecione outro comercial, se quiser enviar uma agenda já pronta.`}
                   </pre>
                 </ScrollArea>
               </CardContent>
             </Card>
           </div>
         </div>
-      ) : (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Calendar className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
-            <p className="text-muted-foreground">Nenhum lead ativo encontrado para {selectedTab}.</p>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }
