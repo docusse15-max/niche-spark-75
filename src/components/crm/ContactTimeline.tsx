@@ -63,7 +63,7 @@ function generatePlannedContacts(leads: Lead[]): TimelineEntry[] {
     entries.push({
       lead: l,
       date: dateStr,
-      author: comerciais[cIdx % comerciais.length],
+      author: l.responsavel || comerciais[cIdx % comerciais.length],
       note: `Primeiro contato planejado — ${l.segmento}`,
       type: dateStr === todayStr ? "today" : "future",
     });
