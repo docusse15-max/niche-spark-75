@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { getInitialLeads, Lead, COMERCIAIS, STATUS_LABELS, type LeadStatus, getActivityLog, type ActivityLogEntry } from "@/data/leads";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -120,15 +120,20 @@ function FunnelBar({ label, value, max, color }: { label: string; value: number;
 
 export default function ComercialEvolution() {
   const leads = useMemo(() => getInitialLeads(), []);
+  const [activityLogs, setActivityLogs] = useState<ActivityLogEntry[]>([]);
+
+  useEffect(() => {
+    getActivityLog().then(setActivityLogs);
+  }, []);
 
   const allStats = useMemo(() =>
-    COMERCIAIS.map(name => calcStats(leads, name))
+    COMERCIAIS.map(name => calcStats(leads, name, activityLogs))
       .sort((a, b) => {
         if (b.fechados !== a.fechados) return b.fechados - a.fechados;
         if (b.reunioes !== a.reunioes) return b.reunioes - a.reunioes;
         return b.interacoes - a.interacoes;
       }),
-    [leads]
+    [leads, activityLogs]
   );
 
   const totalLeads = leads.length;
