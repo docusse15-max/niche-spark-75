@@ -11,10 +11,13 @@ export default function ProductivityPanel({ leads }: ProductivityPanelProps) {
   leads.forEach(l => {
     l.historico.forEach(h => {
       if (h.author) {
-        const existing = authorMap.get(h.author) || { contatos: 0, total: 0 };
+        const normalizedAuthor = h.author.trim();
+        // Normalize to match COMERCIAIS names (case-insensitive grouping)
+        const key = normalizedAuthor.charAt(0).toUpperCase() + normalizedAuthor.slice(1).toLowerCase();
+        const existing = authorMap.get(key) || { contatos: 0, total: 0 };
         existing.contatos += 1;
         existing.total += 1;
-        authorMap.set(h.author, existing);
+        authorMap.set(key, existing);
       }
     });
   });
