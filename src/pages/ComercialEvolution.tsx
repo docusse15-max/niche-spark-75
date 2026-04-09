@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { getInitialLeads, Lead, COMERCIAIS, STATUS_LABELS, type LeadStatus } from "@/data/leads";
+import { getInitialLeads, Lead, COMERCIAIS, STATUS_LABELS, type LeadStatus, getActivityLog, type ActivityLogEntry } from "@/data/leads";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
