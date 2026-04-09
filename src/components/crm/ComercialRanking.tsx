@@ -98,13 +98,14 @@ export default function ComercialRanking({ leads }: ComercialRankingProps) {
 
       leads.forEach(l => {
         const hasInteraction = l.historico.some(h => h.author === name);
-        if (hasInteraction) {
+        const isResponsavel = l.responsavel === name;
+        if (hasInteraction || isResponsavel) {
           leadsAtivos++;
           interacoes += l.historico.filter(h => h.author === name).length;
         }
-        if (hasInteraction && l.status === "fechado") fechados++;
-        if (hasInteraction && l.status === "reuniao_agendada") reunioes++;
-        if (hasInteraction && l.status === "proposta_enviada") propostas++;
+        if ((hasInteraction || isResponsavel) && l.status === "fechado") fechados++;
+        if ((hasInteraction || isResponsavel) && l.status === "reuniao_agendada") reunioes++;
+        if ((hasInteraction || isResponsavel) && l.status === "proposta_enviada") propostas++;
       });
 
       const { ultima, dias } = calcDiasSemAcao(leads, name);
