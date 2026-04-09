@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { getInitialLeads, Lead, COMERCIAIS, STATUS_LABELS, type LeadStatus } from "@/data/leads";
+import { useMemo, useState, useEffect } from "react";
+import { getInitialLeads, Lead, COMERCIAIS, STATUS_LABELS, type LeadStatus, getActivityLog, type ActivityLogEntry } from "@/data/leads";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -28,20 +28,21 @@ interface ComercialDetail {
   nichos: Record<string, number>;
 }
 
-function calcStats(leads: Lead[], name: string): ComercialDetail {
+function calcStats(leads: Lead[], name: string, activityLogs: ActivityLogEntry[]): ComercialDetail {
   let interacoes = 0, leadsAtivos = 0, fechados = 0, perdidos = 0, reunioes = 0, propostas = 0, emNegociacao = 0;
   let quentes = 0, mornos = 0, frios = 0;
   const leadsPorStatus: Record<string, number> = {};
   const nichos: Record<string, number> = {};
   let latestDate: string | null = null;
+  const nameLower = name.toLowerCase().trim();
 
   leads.forEach(l => {
-    const isResponsavel = l.responsavel === name;
-    const hasInteraction = l.historico.some(h => h.author === name);
+    const isResponsavel = l.responsavel?.toLowerCase().trim() === nameLower;
+    const hasInteraction = l.historico.some(h => h.author?.toLowerCase().trim() === nameLower);
     if (!isResponsavel && !hasInteraction) return;
 
     leadsAtivos++;
-    interacoes += l.historico.filter(h => h.author === name).length;
+    interacoes += l.historico.filter(h => h.author?.toLowerCase().trim() === nameLower).length;
 
     leadsPorStatus[l.status] = (leadsPorStatus[l.status] || 0) + 1;
     nichos[l.segmento] = (nichos[l.segmento] || 0) + 1;
@@ -56,8 +57,23 @@ function calcStats(leads: Lead[], name: string): ComercialDetail {
     if (l.temperatura === "frio") frios++;
 
     l.historico.forEach(h => {
-      if (h.author === name && h.date && (!latestDate || h.date > latestDate)) latestDate = h.date;
+      if (h.author?.toLowerCase().trim() === nameLower && h.date && (!latestDate || h.date > latestDate)) latestDate = h.date;
     });
+  });
+
+  // Count activity logs (leads created, notes, status changes) for this person
+  const logsDoComercial = activityLogs.filter(log => log.author.toLowerCase().trim() === nameLower);
+  const leadsCriados = logsDoComercial.filter(log => log.action === "lead_criado").length;
+  const notasAdicionadas = logsDoComercial.filter(log => log.action === "nota_adicionada").length;
+  const statusAlterados = logsDoComercial.filter(log => log.action === "status_alterado").length;
+  
+  // Add activity log actions to interacoes count (avoid double-counting historico notes)
+  interacoes = Math.max(interacoes, leadsCriados + notasAdicionadas + statusAlterados);
+
+  // Update latestDate from activity logs
+  logsDoComercial.forEach(log => {
+    const logDate = log.timestamp.split("T")[0];
+    if (!latestDate || logDate > latestDate) latestDate = logDate;
   });
 
   const dias = latestDate ? Math.floor((Date.now() - new Date(latestDate).getTime()) / 86400000) : 999;
@@ -104,15 +120,20 @@ function FunnelBar({ label, value, max, color }: { label: string; value: number;
 
 export default function ComercialEvolution() {
   const leads = useMemo(() => getInitialLeads(), []);
+  const [activityLogs, setActivityLogs] = useState<ActivityLogEntry[]>([]);
+
+  useEffect(() => {
+    getActivityLog().then(setActivityLogs);
+  }, []);
 
   const allStats = useMemo(() =>
-    COMERCIAIS.map(name => calcStats(leads, name))
+    COMERCIAIS.map(name => calcStats(leads, name, activityLogs))
       .sort((a, b) => {
         if (b.fechados !== a.fechados) return b.fechados - a.fechados;
         if (b.reunioes !== a.reunioes) return b.reunioes - a.reunioes;
         return b.interacoes - a.interacoes;
       }),
-    [leads]
+    [leads, activityLogs]
   );
 
   const totalLeads = leads.length;
