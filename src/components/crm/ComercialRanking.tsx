@@ -19,9 +19,10 @@ interface ComercialStats {
 
 function calcDiasSemAcao(leads: Lead[], name: string): { ultima: string | null; dias: number } {
   let latest: string | null = null;
+  const nameLower = name.toLowerCase().trim();
   leads.forEach(l => {
     l.historico.forEach(h => {
-      if (h.author === name && h.date) {
+      if (h.author?.toLowerCase().trim() === nameLower && h.date) {
         if (!latest || h.date > latest) latest = h.date;
       }
     });
