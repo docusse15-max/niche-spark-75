@@ -17,7 +17,7 @@ interface NewLeadDialogProps {
 export default function NewLeadDialog({ open, onClose, onSave }: NewLeadDialogProps) {
   const [form, setForm] = useState({
     empresa: "", segmento: "" as any, cidade: "" as Cidade | "", bairro: "", telefone: "", instagram: "",
-    potencial: "medio" as any, observacoes: "",
+    potencial: "medio" as any, observacoes: "", responsavel: "",
   });
 
   const set = (key: string, val: string) => setForm(f => ({ ...f, [key]: val }));
@@ -72,13 +72,19 @@ export default function NewLeadDialog({ open, onClose, onSave }: NewLeadDialogPr
             <div><Label className="text-xs">Bairro *</Label>
               <Select value={form.bairro || undefined} onValueChange={v => set("bairro", v)} disabled={!form.cidade}><SelectTrigger className="h-9"><SelectValue placeholder={form.cidade ? "Selecione" : "Escolha cidade"} /></SelectTrigger><SelectContent>{bairrosForCity.map(b => <SelectItem key={b.nome} value={b.nome}>{b.nome}</SelectItem>)}</SelectContent></Select>
             </div>
-            <div><Label className="text-xs">Potencial</Label>
-              <Select value={form.potencial} onValueChange={v => set("potencial", v)}><SelectTrigger className="h-9"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="baixo">Baixo</SelectItem><SelectItem value="medio">Médio</SelectItem><SelectItem value="alto">Alto</SelectItem><SelectItem value="premium">Premium</SelectItem></SelectContent></Select>
+            <div><Label className="text-xs">Responsável</Label>
+              <Select value={form.responsavel || undefined} onValueChange={v => set("responsavel", v)}><SelectTrigger className="h-9"><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{COMERCIAIS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
+            <div><Label className="text-xs">Potencial</Label>
+              <Select value={form.potencial} onValueChange={v => set("potencial", v)}><SelectTrigger className="h-9"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="baixo">Baixo</SelectItem><SelectItem value="medio">Médio</SelectItem><SelectItem value="alto">Alto</SelectItem><SelectItem value="premium">Premium</SelectItem></SelectContent></Select>
+            </div>
             <div><Label className="text-xs">Telefone</Label><Input value={form.telefone} onChange={e => set("telefone", e.target.value)} placeholder="(67) 99999-0000" className="h-9" /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
             <div><Label className="text-xs">Instagram</Label><Input value={form.instagram} onChange={e => set("instagram", e.target.value)} placeholder="@perfil" className="h-9" /></div>
+            <div />
           </div>
           <div><Label className="text-xs">Observações</Label><Textarea value={form.observacoes} onChange={e => set("observacoes", e.target.value)} placeholder="Notas iniciais..." rows={2} className="text-sm" /></div>
         </div>
