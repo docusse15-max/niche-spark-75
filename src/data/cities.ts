@@ -7,11 +7,12 @@ export type Cidade =
   | "Bonito"
   | "Corumbá"
   | "Maracaju"
-  | "Rio Brilhante";
+  | "Rio Brilhante"
+  | "Costa Rica";
 
 export const CIDADES: Cidade[] = [
   "Campo Grande", "Dourados", "Ponta Porã", "Aquidauana",
-  "Sidrolândia", "Bonito", "Corumbá", "Maracaju", "Rio Brilhante",
+  "Sidrolândia", "Bonito", "Corumbá", "Maracaju", "Rio Brilhante", "Costa Rica",
 ];
 
 export type Bairro = string;
@@ -107,6 +108,16 @@ export const CIDADE_CONFIGS: Record<Cidade, CidadeConfig> = {
       { nome: "Centro", coords: [-21.8014, -54.5461] },
       { nome: "Vila Nova", coords: [-21.7990, -54.5430] },
       { nome: "Jardim Progresso", coords: [-21.8040, -54.5490] },
+    ],
+  },
+  "Costa Rica": {
+    center: [-18.5443, -53.1281],
+    bairros: [
+      { nome: "Centro", coords: [-18.5443, -53.1281] },
+      { nome: "Vila Alta", coords: [-18.5420, -53.1250] },
+      { nome: "Jardim Aeroporto", coords: [-18.5470, -53.1310] },
+      { nome: "Vila São Pedro", coords: [-18.5400, -53.1300] },
+      { nome: "Bairro Industrial", coords: [-18.5490, -53.1230] },
     ],
   },
 };
