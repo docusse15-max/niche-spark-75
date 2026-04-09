@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { NICHOS, Lead } from "@/data/leads";
+import { NICHOS, Lead, COMERCIAIS } from "@/data/leads";
 import { CIDADES, CIDADE_CONFIGS, type Cidade } from "@/data/cities";
 import { useState } from "react";
 
@@ -41,7 +41,7 @@ export default function NewLeadDialog({ open, onClose, onSave }: NewLeadDialogPr
       status: "novo",
       ultimoContato: "",
       proximaAcao: "",
-      responsavel: "",
+      responsavel: form.responsavel,
       observacoes: form.observacoes,
       descricao: "",
       motivoRecorrencia: "",
@@ -50,7 +50,7 @@ export default function NewLeadDialog({ open, onClose, onSave }: NewLeadDialogPr
       lng: bairroObj ? bairroObj.coords[1] + (Math.random() - 0.5) * 0.01 : undefined,
     };
     onSave(lead);
-    setForm({ empresa: "", segmento: "" as any, cidade: "", bairro: "", telefone: "", instagram: "", potencial: "medio", observacoes: "" });
+    setForm({ empresa: "", segmento: "" as any, cidade: "", bairro: "", telefone: "", instagram: "", potencial: "medio", observacoes: "", responsavel: "" });
     onClose();
   };
 
