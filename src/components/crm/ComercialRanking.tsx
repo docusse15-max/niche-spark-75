@@ -1,6 +1,6 @@
-import { Lead, COMERCIAIS, getActivityLog } from "@/data/leads";
+import { Lead, COMERCIAIS, getActivityLog, ActivityLogEntry } from "@/data/leads";
 import { Trophy, Medal, TrendingUp, Phone, AlertTriangle, Clock, UserPlus } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 interface ComercialRankingProps {
   leads: Lead[];
@@ -90,8 +90,10 @@ function BarChart({ stats }: { stats: ComercialStats[] }) {
 }
 
 export default function ComercialRanking({ leads }: ComercialRankingProps) {
+  const [logs, setLogs] = useState<ActivityLogEntry[]>([]);
+  useEffect(() => { getActivityLog().then(setLogs); }, [leads]);
+
   const stats: ComercialStats[] = useMemo(() => {
-    const logs = getActivityLog();
     return COMERCIAIS.map(name => {
       let interacoes = 0;
       let leadsAtivos = 0;
@@ -129,7 +131,7 @@ export default function ComercialRanking({ leads }: ComercialRankingProps) {
       const { ultima, dias } = calcDiasSemAcao(leads, name);
       return { name, interacoes, leadsAtivos, leadsCriados, fechados, reunioes, propostas, ultimaAcao: ultima, diasSemAcao: dias };
     });
-  }, [leads]);
+  }, [leads, logs]);
 
   const sorted = [...stats].sort((a, b) => {
     if (b.fechados !== a.fechados) return b.fechados - a.fechados;
