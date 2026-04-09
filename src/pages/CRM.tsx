@@ -12,6 +12,7 @@ import ComercialRanking from "@/components/crm/ComercialRanking";
 import ContactTimeline from "@/components/crm/ContactTimeline";
 import NewLeadDialog from "@/components/crm/NewLeadDialog";
 import SearchLeadsDialog from "@/components/crm/SearchLeadsDialog";
+import ExportDialog from "@/components/crm/ExportDialog";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { User } from "lucide-react";
@@ -32,6 +33,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
   const [searchLeadsOpen, setSearchLeadsOpen] = useState(false);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [belezaFilter, setBelezaFilter] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
 
   const persist = useCallback((updated: Lead[]) => {
     setLeads(updated);
@@ -145,7 +147,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
       <div className="max-w-[1400px] mx-auto px-4 py-4 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <CRMHeader leads={leads} onNewLead={() => setNewLeadOpen(true)} onRefresh={() => { persist(getInitialLeads()); toast({ title: "Base atualizada" }); }} onExport={handleExport} onSearchLeads={() => setSearchLeadsOpen(true)} belezaFilter={belezaFilter} onToggleBeleza={() => setBelezaFilter(v => !v)} />
+            <CRMHeader leads={leads} onNewLead={() => setNewLeadOpen(true)} onRefresh={() => { persist(getInitialLeads()); toast({ title: "Base atualizada" }); }} onExport={() => setExportOpen(true)} onSearchLeads={() => setSearchLeadsOpen(true)} belezaFilter={belezaFilter} onToggleBeleza={() => setBelezaFilter(v => !v)} />
           </div>
         </div>
         <div className="flex items-center justify-between">
@@ -175,6 +177,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
       <LeadDetailSheet lead={selectedLead} open={sheetOpen} onClose={() => setSheetOpen(false)} onAddNote={handleAddNote} onDeleteLead={handleDeleteLead} />
       <NewLeadDialog open={newLeadOpen} onClose={() => setNewLeadOpen(false)} onSave={handleNewLead} />
       <SearchLeadsDialog open={searchLeadsOpen} onClose={() => setSearchLeadsOpen(false)} onImport={handleImportLeads} existingLeads={leads} />
+      <ExportDialog open={exportOpen} onClose={() => setExportOpen(false)} onConfirm={handleExport} />
     </div>
   );
 }
