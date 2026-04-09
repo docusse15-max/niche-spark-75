@@ -1,5 +1,5 @@
-import { Lead, COMERCIAIS } from "@/data/leads";
-import { Trophy, Medal, TrendingUp, Phone, AlertTriangle, Clock } from "lucide-react";
+import { Lead, COMERCIAIS, getActivityLog } from "@/data/leads";
+import { Trophy, Medal, TrendingUp, Phone, AlertTriangle, Clock, UserPlus } from "lucide-react";
 import { useMemo } from "react";
 
 interface ComercialRankingProps {
@@ -10,6 +10,7 @@ interface ComercialStats {
   name: string;
   interacoes: number;
   leadsAtivos: number;
+  leadsCriados: number;
   fechados: number;
   reunioes: number;
   propostas: number;
@@ -90,6 +91,7 @@ function BarChart({ stats }: { stats: ComercialStats[] }) {
 
 export default function ComercialRanking({ leads }: ComercialRankingProps) {
   const stats: ComercialStats[] = useMemo(() => {
+    const logs = getActivityLog();
     return COMERCIAIS.map(name => {
       let interacoes = 0;
       let leadsAtivos = 0;
@@ -98,6 +100,17 @@ export default function ComercialRanking({ leads }: ComercialRankingProps) {
       let propostas = 0;
 
       const nameLower = name.toLowerCase().trim();
+
+      // Contar leads criados por este comercial no log de atividades
+      const leadsCriados = logs.filter(log =>
+        log.action === "lead_criado" && log.author.toLowerCase().trim() === nameLower
+      ).length;
+
+      // Contar também notas adicionadas como interações extras
+      const notasLog = logs.filter(log =>
+        log.action === "nota_adicionada" && log.author.toLowerCase().trim() === nameLower
+      ).length;
+
       leads.forEach(l => {
         const hasInteraction = l.historico.some(h => h.author?.toLowerCase().trim() === nameLower);
         const isResponsavel = l.responsavel?.toLowerCase().trim() === nameLower;
@@ -110,8 +123,11 @@ export default function ComercialRanking({ leads }: ComercialRankingProps) {
         if ((hasInteraction || isResponsavel) && l.status === "proposta_enviada") propostas++;
       });
 
+      // Somar leads criados e notas do log às interações totais
+      interacoes += leadsCriados + notasLog;
+
       const { ultima, dias } = calcDiasSemAcao(leads, name);
-      return { name, interacoes, leadsAtivos, fechados, reunioes, propostas, ultimaAcao: ultima, diasSemAcao: dias };
+      return { name, interacoes, leadsAtivos, leadsCriados, fechados, reunioes, propostas, ultimaAcao: ultima, diasSemAcao: dias };
     });
   }, [leads]);
 
@@ -148,6 +164,9 @@ export default function ComercialRanking({ leads }: ComercialRankingProps) {
                 <div className="flex gap-2 mt-0.5 flex-wrap">
                   <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
                     <Phone className="h-2.5 w-2.5" />{s.interacoes}
+                  </span>
+                  <span className="text-[10px] text-sky-400 flex items-center gap-0.5">
+                    <UserPlus className="h-2.5 w-2.5" />{s.leadsCriados} criados
                   </span>
                   <span className="text-[10px] text-emerald-400">{s.fechados} ✓</span>
                   <span className="text-[10px] text-purple-400">{s.reunioes} 📅</span>
