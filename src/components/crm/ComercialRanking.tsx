@@ -97,12 +97,13 @@ export default function ComercialRanking({ leads }: ComercialRankingProps) {
       let reunioes = 0;
       let propostas = 0;
 
+      const nameLower = name.toLowerCase().trim();
       leads.forEach(l => {
-        const hasInteraction = l.historico.some(h => h.author === name);
-        const isResponsavel = l.responsavel === name;
+        const hasInteraction = l.historico.some(h => h.author?.toLowerCase().trim() === nameLower);
+        const isResponsavel = l.responsavel?.toLowerCase().trim() === nameLower;
         if (hasInteraction || isResponsavel) {
           leadsAtivos++;
-          interacoes += l.historico.filter(h => h.author === name).length;
+          interacoes += l.historico.filter(h => h.author?.toLowerCase().trim() === nameLower).length;
         }
         if ((hasInteraction || isResponsavel) && l.status === "fechado") fechados++;
         if ((hasInteraction || isResponsavel) && l.status === "reuniao_agendada") reunioes++;
