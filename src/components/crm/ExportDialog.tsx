@@ -10,7 +10,7 @@ interface ExportDialogProps {
   onConfirm: () => void;
 }
 
-const EXPORT_PASSWORD = "vfmoney2025";
+const EXPORT_PASSWORD = "56239050";
 
 export default function ExportDialog({ open, onClose, onConfirm }: ExportDialogProps) {
   const [senha, setSenha] = useState("");
