@@ -57,6 +57,7 @@ export default function ActivityLog() {
   const [loading, setLoading] = useState(true);
   const [filterUser, setFilterUser] = useState<string>("all");
   const [filterAction, setFilterAction] = useState<string>("all");
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const navigate = useNavigate();
   const currentUser = sessionStorage.getItem("crm_user") || "Desconhecido";
 
