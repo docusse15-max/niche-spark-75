@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, UserPlus, LogIn } from "lucide-react";
 import logoVfmoney from "@/assets/logo-vfmoney.png";
+import { trackEvent, initLocationTracking } from "@/lib/activity-tracker";
 
 const COMERCIAIS = ["Dorileu", "Felipe", "Gabi", "Janna"];
 
@@ -31,6 +32,13 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
     }
 
     sessionStorage.setItem("crm_user", name);
+    initLocationTracking();
+    trackEvent({
+      action: "login",
+      author: name,
+      details: `Login realizado`,
+      page: "/login",
+    });
     onLogin(name);
   };
 
