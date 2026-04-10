@@ -57,6 +57,7 @@ export default function ActivityLog() {
   const [loading, setLoading] = useState(true);
   const [filterUser, setFilterUser] = useState<string>("all");
   const [filterAction, setFilterAction] = useState<string>("all");
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const navigate = useNavigate();
   const currentUser = sessionStorage.getItem("crm_user") || "Desconhecido";
 
@@ -280,23 +281,41 @@ export default function ActivityLog() {
             </div>
           </TabsContent>
 
-          <TabsContent value="users">
-            <Card className="border-border">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-muted-foreground">Ações por Usuário</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={userActivity} layout="vertical" margin={{ left: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 12%, 20%)" />
-                    <XAxis type="number" tick={{ fill: "hsl(220, 8%, 55%)", fontSize: 11 }} />
-                    <YAxis dataKey="name" type="category" tick={{ fill: "hsl(220, 8%, 55%)", fontSize: 11 }} width={80} />
-                    <Tooltip contentStyle={{ background: "hsl(220, 15%, 11%)", border: "1px solid hsl(220, 12%, 20%)", borderRadius: 8, color: "hsl(45, 10%, 90%)" }} />
-                    <Bar dataKey="ações" fill="hsl(43, 75%, 52%)" radius={[0, 6, 6, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+          <TabsContent value="users" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <Card className="border-border">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm text-muted-foreground">Ações por Usuário <span className="text-[10px] text-primary/60">(clique para detalhar)</span></CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={userActivity} layout="vertical" margin={{ left: 20 }} onClick={(data) => {
+                      if (data?.activePayload?.[0]?.payload?.name) {
+                        setSelectedUser(data.activePayload[0].payload.name);
+                      }
+                    }} style={{ cursor: "pointer" }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 12%, 20%)" />
+                      <XAxis type="number" tick={{ fill: "hsl(220, 8%, 55%)", fontSize: 11 }} />
+                      <YAxis dataKey="name" type="category" tick={{ fill: "hsl(220, 8%, 55%)", fontSize: 11 }} width={80} />
+                      <Tooltip contentStyle={{ background: "hsl(220, 15%, 11%)", border: "1px solid hsl(220, 12%, 20%)", borderRadius: 8, color: "hsl(45, 10%, 90%)" }} />
+                      <Bar dataKey="ações" fill="hsl(43, 75%, 52%)" radius={[0, 6, 6, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* User Detail Panel */}
+              {selectedUser ? (
+                <UserDetailPanel user={selectedUser} log={log} onClose={() => setSelectedUser(null)} />
+              ) : (
+                <Card className="border-border flex items-center justify-center">
+                  <CardContent className="text-center py-12">
+                    <MousePointerClick className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
+                    <p className="text-sm text-muted-foreground">Clique em um usuário no gráfico para ver o detalhamento completo</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </TabsContent>
 
           <TabsContent value="hourly">
@@ -407,6 +426,119 @@ function StatCard({ icon, label, value, sub, alert }: { icon: React.ReactNode; l
         </div>
         <span className="text-xs text-muted-foreground">{label}</span>
         <span className="text-[10px] text-muted-foreground/60">{sub}</span>
+      </CardContent>
+    </Card>
+  );
+}
+
+function UserDetailPanel({ user, log, onClose }: { user: string; log: LogEntry[]; onClose: () => void }) {
+  const userLog = useMemo(() => log.filter(e => e.author === user), [log, user]);
+
+  const actionCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    userLog.forEach(e => { counts[e.action] = (counts[e.action] || 0) + 1; });
+    return Object.entries(counts)
+      .map(([action, count]) => ({ action, count, ...(ACTION_META[action] || { label: action, icon: "•", color: "bg-zinc-500/20 text-zinc-400" }) }))
+      .sort((a, b) => b.count - a.count);
+  }, [userLog]);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const todayCount = userLog.filter(e => e.created_at.slice(0, 10) === today).length;
+  const firstSeen = userLog.length > 0 ? new Date(userLog[userLog.length - 1].created_at) : null;
+  const lastSeen = userLog.length > 0 ? new Date(userLog[0].created_at) : null;
+  const logins = userLog.filter(e => e.action === "login").length;
+  const leadsCreated = userLog.filter(e => e.action === "lead_criado").length;
+  const hasLocation = userLog.some(e => e.latitude && e.longitude);
+  const lastLocation = userLog.find(e => e.latitude && e.longitude);
+
+  const recentActions = userLog.slice(0, 15);
+
+  return (
+    <Card className="border-primary/30 border">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base gold-text flex items-center gap-2">
+            <Users className="h-4 w-4" /> {user}
+          </CardTitle>
+          <Button variant="ghost" size="sm" onClick={onClose} className="text-muted-foreground hover:text-foreground text-xs">✕ Fechar</Button>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="bg-secondary/50 rounded-lg p-2.5 text-center">
+            <p className="text-lg font-bold gold-text">{userLog.length}</p>
+            <p className="text-[10px] text-muted-foreground">Total de ações</p>
+          </div>
+          <div className="bg-secondary/50 rounded-lg p-2.5 text-center">
+            <p className="text-lg font-bold gold-text">{todayCount}</p>
+            <p className="text-[10px] text-muted-foreground">Ações hoje</p>
+          </div>
+          <div className="bg-secondary/50 rounded-lg p-2.5 text-center">
+            <p className="text-lg font-bold gold-text">{logins}</p>
+            <p className="text-[10px] text-muted-foreground">Logins</p>
+          </div>
+          <div className="bg-secondary/50 rounded-lg p-2.5 text-center">
+            <p className="text-lg font-bold gold-text">{leadsCreated}</p>
+            <p className="text-[10px] text-muted-foreground">Leads criados</p>
+          </div>
+        </div>
+
+        {/* Dates */}
+        <div className="space-y-1 text-xs text-muted-foreground">
+          {firstSeen && <p>📅 Primeiro acesso: <span className="text-foreground">{firstSeen.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span></p>}
+          {lastSeen && <p>🕐 Último acesso: <span className="text-foreground">{lastSeen.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span></p>}
+          {lastLocation && (
+            <p className="flex items-center gap-1">
+              <MapPin className="h-3 w-3 text-primary" />
+              Última localização:
+              <a href={`https://www.google.com/maps?q=${lastLocation.latitude},${lastLocation.longitude}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                {(lastLocation.latitude as number).toFixed(4)}, {(lastLocation.longitude as number).toFixed(4)}
+              </a>
+            </p>
+          )}
+        </div>
+
+        {/* Action Breakdown */}
+        <div>
+          <p className="text-xs font-semibold text-muted-foreground mb-2">Breakdown de Ações</p>
+          <div className="space-y-1.5">
+            {actionCounts.map(item => {
+              const pct = Math.round((item.count / userLog.length) * 100);
+              return (
+                <div key={item.action} className="space-y-0.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">{item.icon} {item.label}</span>
+                    <span className="font-semibold text-foreground">{item.count} <span className="text-muted-foreground/60">({pct}%)</span></span>
+                  </div>
+                  <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+                    <div className="h-full rounded-full bg-primary/70" style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Recent Actions */}
+        <div>
+          <p className="text-xs font-semibold text-muted-foreground mb-2">Últimas 15 ações</p>
+          <div className="space-y-1 max-h-[200px] overflow-y-auto pr-1">
+            {recentActions.map(entry => {
+              const meta = ACTION_META[entry.action];
+              const time = new Date(entry.created_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+              return (
+                <div key={entry.id} className="flex items-center gap-2 text-[11px] p-1.5 rounded bg-secondary/30">
+                  <span className="text-muted-foreground/60 w-[75px] shrink-0 font-mono">{time}</span>
+                  <Badge className={`text-[9px] py-0 ${meta?.color || "bg-zinc-500/20 text-zinc-400"}`}>
+                    {meta?.icon} {meta?.label || entry.action}
+                  </Badge>
+                  {entry.lead_empresa !== "-" && <span className="text-foreground truncate">{entry.lead_empresa}</span>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
