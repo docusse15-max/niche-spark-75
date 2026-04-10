@@ -281,23 +281,41 @@ export default function ActivityLog() {
             </div>
           </TabsContent>
 
-          <TabsContent value="users">
-            <Card className="border-border">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-muted-foreground">Ações por Usuário</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={userActivity} layout="vertical" margin={{ left: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 12%, 20%)" />
-                    <XAxis type="number" tick={{ fill: "hsl(220, 8%, 55%)", fontSize: 11 }} />
-                    <YAxis dataKey="name" type="category" tick={{ fill: "hsl(220, 8%, 55%)", fontSize: 11 }} width={80} />
-                    <Tooltip contentStyle={{ background: "hsl(220, 15%, 11%)", border: "1px solid hsl(220, 12%, 20%)", borderRadius: 8, color: "hsl(45, 10%, 90%)" }} />
-                    <Bar dataKey="ações" fill="hsl(43, 75%, 52%)" radius={[0, 6, 6, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+          <TabsContent value="users" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <Card className="border-border">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm text-muted-foreground">Ações por Usuário <span className="text-[10px] text-primary/60">(clique para detalhar)</span></CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={userActivity} layout="vertical" margin={{ left: 20 }} onClick={(data) => {
+                      if (data?.activePayload?.[0]?.payload?.name) {
+                        setSelectedUser(data.activePayload[0].payload.name);
+                      }
+                    }} style={{ cursor: "pointer" }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 12%, 20%)" />
+                      <XAxis type="number" tick={{ fill: "hsl(220, 8%, 55%)", fontSize: 11 }} />
+                      <YAxis dataKey="name" type="category" tick={{ fill: "hsl(220, 8%, 55%)", fontSize: 11 }} width={80} />
+                      <Tooltip contentStyle={{ background: "hsl(220, 15%, 11%)", border: "1px solid hsl(220, 12%, 20%)", borderRadius: 8, color: "hsl(45, 10%, 90%)" }} />
+                      <Bar dataKey="ações" fill="hsl(43, 75%, 52%)" radius={[0, 6, 6, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* User Detail Panel */}
+              {selectedUser ? (
+                <UserDetailPanel user={selectedUser} log={log} onClose={() => setSelectedUser(null)} />
+              ) : (
+                <Card className="border-border flex items-center justify-center">
+                  <CardContent className="text-center py-12">
+                    <MousePointerClick className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
+                    <p className="text-sm text-muted-foreground">Clique em um usuário no gráfico para ver o detalhamento completo</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </TabsContent>
 
           <TabsContent value="hourly">
