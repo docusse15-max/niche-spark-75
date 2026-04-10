@@ -18,6 +18,7 @@ import HomeEquity from "./pages/HomeEquity.tsx";
 import GestaoComercialCampo from "./pages/GestaoComercialCampo.tsx";
 import DashboardGestor from "./pages/DashboardGestor.tsx";
 import AgendaSugerida from "./pages/AgendaSugerida.tsx";
+import { ActivityTrackerProvider } from "@/components/ActivityTrackerProvider";
 
 const queryClient = new QueryClient();
 
