@@ -1,10 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, RefreshCw, MapPin } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, RefreshCw, MapPin, Lock, ShieldAlert } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logoVfmoney from "@/assets/logo-vfmoney.png";
 import { supabase } from "@/integrations/supabase/client";
+import { trackEvent } from "@/lib/activity-tracker";
+import { toast } from "@/hooks/use-toast";
+
+const LOG_PASSWORD = "56239050";
 
 interface LogEntry {
   id: string;
@@ -21,9 +27,12 @@ interface LogEntry {
 }
 
 export default function ActivityLog() {
+  const [authenticated, setAuthenticated] = useState(false);
+  const [password, setPassword] = useState("");
   const [log, setLog] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const currentUser = sessionStorage.getItem("crm_user") || "Desconhecido";
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -37,10 +46,81 @@ export default function ActivityLog() {
   }, []);
 
   useEffect(() => {
-    refresh();
-    const interval = setInterval(refresh, 5000);
-    return () => clearInterval(interval);
-  }, [refresh]);
+    if (authenticated) {
+      refresh();
+      const interval = setInterval(refresh, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [refresh, authenticated]);
+
+  const handlePasswordSubmit = () => {
+    if (password === LOG_PASSWORD) {
+      setAuthenticated(true);
+      trackEvent({
+        action: "acesso_log",
+        author: currentUser,
+        details: "Acessou o Log de Atividades com senha correta",
+        page: "/log",
+      });
+    } else {
+      trackEvent({
+        action: "tentativa_acesso_log",
+        author: currentUser,
+        details: `Tentativa de acesso ao Log de Atividades com senha incorreta`,
+        page: "/log",
+      });
+      toast({
+        title: "Senha incorreta",
+        description: "Essa tentativa foi registrada no sistema.",
+        variant: "destructive",
+      });
+      setPassword("");
+    }
+  };
+
+  if (!authenticated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border gold-border gold-glow">
+          <CardHeader className="text-center space-y-3">
+            <ShieldAlert className="h-12 w-12 mx-auto text-primary" />
+            <CardTitle className="text-xl gold-text">Acesso Restrito</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              O Log de Atividades é protegido. Digite a senha para acessar.
+            </p>
+            <p className="text-xs text-destructive/80">
+              ⚠️ Tentativas incorretas são registradas no sistema
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Input
+              type="password"
+              placeholder="Digite a senha..."
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className="h-12 text-base text-center"
+              autoFocus
+              onKeyDown={e => e.key === "Enter" && password && handlePasswordSubmit()}
+            />
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1" onClick={() => navigate("/")}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Voltar
+              </Button>
+              <Button
+                className="flex-1 gold-gradient text-background font-semibold hover:opacity-90"
+                disabled={!password}
+                onClick={handlePasswordSubmit}
+              >
+                <Lock className="h-4 w-4 mr-2" />
+                Entrar
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const actionColors: Record<string, string> = {
     "status_alterado": "bg-amber-500/20 text-amber-400",
@@ -51,6 +131,8 @@ export default function ActivityLog() {
     "login": "bg-green-500/20 text-green-400",
     "logout": "bg-orange-500/20 text-orange-400",
     "navegacao": "bg-cyan-500/20 text-cyan-400",
+    "acesso_log": "bg-emerald-500/20 text-emerald-400",
+    "tentativa_acesso_log": "bg-red-600/20 text-red-500",
   };
 
   const actionLabels: Record<string, string> = {
@@ -62,6 +144,8 @@ export default function ActivityLog() {
     "login": "🔐 Login",
     "logout": "🚪 Logout",
     "navegacao": "📍 Navegação",
+    "acesso_log": "✅ Acesso ao Log",
+    "tentativa_acesso_log": "🚨 Tentativa de acesso",
   };
 
   return (
@@ -96,7 +180,7 @@ export default function ActivityLog() {
               const mapsUrl = hasLocation ? `https://www.google.com/maps?q=${entry.latitude},${entry.longitude}` : null;
 
               return (
-                <div key={entry.id} className="flex items-start gap-3 p-3 bg-card border border-border rounded-lg">
+                <div key={entry.id} className={`flex items-start gap-3 p-3 bg-card border rounded-lg ${entry.action === "tentativa_acesso_log" ? "border-red-500/40" : "border-border"}`}>
                   <div className="text-xs text-muted-foreground whitespace-nowrap mt-0.5 w-[90px] shrink-0">{timeStr}</div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
