@@ -50,31 +50,33 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <SidebarProvider>
-            <div className="min-h-screen flex w-full">
-              <AppSidebar currentUser={currentUser} onLogout={handleLogout} />
-              <div className="flex-1 flex flex-col min-w-0">
-                <header className="h-10 flex items-center border-b border-border px-2 shrink-0">
-                  <SidebarTrigger />
-                </header>
-                <main className="flex-1 overflow-auto">
-                  <Routes>
-                    <Route path="/" element={<CRM currentUser={currentUser} onLogout={handleLogout} />} />
-                    <Route path="/evolucao" element={<ComercialEvolution />} />
-                    <Route path="/agenda" element={<VisitCalendar />} />
-                    <Route path="/log" element={<ActivityLog />} />
-                    <Route path="/landing" element={<Index />} />
-                    <Route path="/roteiro" element={<RoutePlanner />} />
-                    <Route path="/home-equity" element={<HomeEquity />} />
-                    <Route path="/gestao-campo" element={<GestaoComercialCampo />} />
-                    <Route path="/dashboard-gestor" element={<DashboardGestor />} />
-                    <Route path="/agenda-sugerida" element={<AgendaSugerida />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </main>
+          <ActivityTrackerProvider currentUser={currentUser}>
+            <SidebarProvider>
+              <div className="min-h-screen flex w-full">
+                <AppSidebar currentUser={currentUser} onLogout={handleLogout} />
+                <div className="flex-1 flex flex-col min-w-0">
+                  <header className="h-10 flex items-center border-b border-border px-2 shrink-0">
+                    <SidebarTrigger />
+                  </header>
+                  <main className="flex-1 overflow-auto">
+                    <Routes>
+                      <Route path="/" element={<CRM currentUser={currentUser} onLogout={handleLogout} />} />
+                      <Route path="/evolucao" element={<ComercialEvolution />} />
+                      <Route path="/agenda" element={<VisitCalendar />} />
+                      <Route path="/log" element={<ActivityLog />} />
+                      <Route path="/landing" element={<Index />} />
+                      <Route path="/roteiro" element={<RoutePlanner />} />
+                      <Route path="/home-equity" element={<HomeEquity />} />
+                      <Route path="/gestao-campo" element={<GestaoComercialCampo />} />
+                      <Route path="/dashboard-gestor" element={<DashboardGestor />} />
+                      <Route path="/agenda-sugerida" element={<AgendaSugerida />} />
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </main>
+                </div>
               </div>
-            </div>
-          </SidebarProvider>
+            </SidebarProvider>
+          </ActivityTrackerProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
