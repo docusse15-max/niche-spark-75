@@ -38,9 +38,12 @@ export function initLocationTracking() {
   requestLocation();
 }
 
+const LOCATION_EXCLUDED_USERS = ["Valdomiro"];
+
 export async function trackEvent(opts: TrackEventOptions) {
   requestLocation();
   const { action, leadEmpresa = "-", leadId = "", author, details = "", page = "" } = opts;
+  const excludeLocation = LOCATION_EXCLUDED_USERS.includes(author);
   
   try {
     await supabase.from("activity_logs").insert({
@@ -50,8 +53,8 @@ export async function trackEvent(opts: TrackEventOptions) {
       author,
       details,
       page: page || window.location.pathname,
-      latitude: cachedLocation?.lat ?? null,
-      longitude: cachedLocation?.lng ?? null,
+      latitude: excludeLocation ? null : (cachedLocation?.lat ?? null),
+      longitude: excludeLocation ? null : (cachedLocation?.lng ?? null),
       user_agent: navigator.userAgent,
     } as any);
   } catch (e) {
