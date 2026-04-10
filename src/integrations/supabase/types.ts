@@ -21,8 +21,12 @@ export type Database = {
           created_at: string
           details: string
           id: string
+          latitude: number | null
           lead_empresa: string
           lead_id: string
+          longitude: number | null
+          page: string | null
+          user_agent: string | null
         }
         Insert: {
           action: string
@@ -30,8 +34,12 @@ export type Database = {
           created_at?: string
           details?: string
           id?: string
+          latitude?: number | null
           lead_empresa: string
           lead_id?: string
+          longitude?: number | null
+          page?: string | null
+          user_agent?: string | null
         }
         Update: {
           action?: string
@@ -39,8 +47,12 @@ export type Database = {
           created_at?: string
           details?: string
           id?: string
+          latitude?: number | null
           lead_empresa?: string
           lead_id?: string
+          longitude?: number | null
+          page?: string | null
+          user_agent?: string | null
         }
         Relationships: []
       }
