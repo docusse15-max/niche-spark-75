@@ -29,7 +29,8 @@ export type Nicho =
   | "Educação"
   | "Coworking"
   | "Contabilidade"
-  | "Limpeza Empresarial";
+  | "Limpeza Empresarial"
+  | "Arena Esportiva";
 
 export type Bairro = string;
 
