@@ -185,6 +185,9 @@ const CIDADE_DDD: Record<Cidade, string> = {
   "Maracaju": "67",
   "Rio Brilhante": "67",
   "Costa Rica": "67",
+  "Cuiabá": "65",
+  "Brasília": "61",
+  "Goiânia": "62",
 };
 
 import aiLeadsRaw from "./ai-leads.json";
