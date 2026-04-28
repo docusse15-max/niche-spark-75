@@ -8,11 +8,15 @@ export type Cidade =
   | "Corumbá"
   | "Maracaju"
   | "Rio Brilhante"
-  | "Costa Rica";
+  | "Costa Rica"
+  | "Cuiabá"
+  | "Brasília"
+  | "Goiânia";
 
 export const CIDADES: Cidade[] = [
   "Campo Grande", "Dourados", "Ponta Porã", "Aquidauana",
   "Sidrolândia", "Bonito", "Corumbá", "Maracaju", "Rio Brilhante", "Costa Rica",
+  "Cuiabá", "Brasília", "Goiânia",
 ];
 
 export type Bairro = string;
