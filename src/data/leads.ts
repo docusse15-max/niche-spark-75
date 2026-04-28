@@ -145,6 +145,7 @@ const DESCRICOES: Record<Nicho, string> = {
   "Coworking": "Espaço de trabalho compartilhado com planos mensais.",
   "Contabilidade": "Escritório contábil com gestão fiscal e tributária.",
   "Limpeza Empresarial": "Empresa de limpeza e conservação para espaços comerciais.",
+  "Arena Esportiva": "Arena esportiva com quadras de beach tennis, futevôlei e eventos.",
 };
 
 const MOTIVOS: Record<Nicho, string> = {
