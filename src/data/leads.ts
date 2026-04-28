@@ -164,6 +164,7 @@ const MOTIVOS: Record<Nicho, string> = {
   "Coworking": "Planos mensais de uso do espaço e serviços adicionais.",
   "Contabilidade": "Honorários mensais fixos para gestão contábil e fiscal.",
   "Limpeza Empresarial": "Contratos mensais/quinzenais de limpeza e conservação.",
+  "Arena Esportiva": "Mensalidades de day-use, alunos de aulas e locação recorrente de quadras.",
 };
 
 function generatePhone(ddd: string): string {
