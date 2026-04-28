@@ -60,7 +60,7 @@ export default function HeatMap({ leads, selectedBairro, onSelectBairro, selecte
 
   const handleCityClick = useCallback((city: string) => {
     const next = selectedCity === city ? "all" : city;
-    setSelectedCity(next);
+    onSelectCity?.(next === "all" ? "" : next);
     onSelectBairro("");
     if (!mapRef.current) return;
     if (next === "all") {
@@ -74,7 +74,7 @@ export default function HeatMap({ leads, selectedBairro, onSelectBairro, selecte
         mapRef.current.fitBounds(bounds, 40);
       }
     }
-  }, [selectedCity, leads, onSelectBairro]);
+  }, [selectedCity, leads, onSelectBairro, onSelectCity]);
 
   const handleBairroClick = useCallback((bairro: string) => {
     const next = selectedBairro === bairro ? "" : bairro;
