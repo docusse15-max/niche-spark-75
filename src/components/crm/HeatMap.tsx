@@ -32,7 +32,13 @@ export default function HeatMap({ leads, selectedBairro, onSelectBairro, selecte
   const visibleLeads = useMemo(() => {
     let filtered = leads;
     if (selectedCity !== "all") filtered = filtered.filter(l => l.cidade === selectedCity);
-    if (selectedBairro) filtered = filtered.filter(l => l.bairro === selectedBairro);
+    if (selectedBairro) {
+      filtered = filtered.filter(l => {
+        const parts = (l.bairro || "").split(" - ");
+        const name = parts.length >= 2 ? parts[parts.length - 1].trim() : (l.bairro || "").trim();
+        return name === selectedBairro || l.bairro === selectedBairro;
+      });
+    }
     return filtered;
   }, [leads, selectedCity, selectedBairro]);
 
