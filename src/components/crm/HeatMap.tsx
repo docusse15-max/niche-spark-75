@@ -8,7 +8,7 @@ import { MapPin, Navigation, MessageSquare, Star } from "lucide-react";
 const GOOGLE_MAPS_KEY = "AIzaSyAPHdxmB8MWTBHHulY7YKjWpf7l5clpUps";
 
 const containerStyle = { width: "100%", height: "400px" };
-const defaultCenter = { lat: -21.5, lng: -55.5 };
+const defaultCenter = { lat: -17.5, lng: -52.0 };
 
 interface HeatMapProps {
   leads: Lead[];
@@ -36,7 +36,14 @@ export default function HeatMap({ leads, selectedBairro, onSelectBairro, selecte
 
   const onLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
-  }, []);
+    // Auto-fit bounds to all leads with coordinates
+    const withCoords = leads.filter(l => l.lat && l.lng);
+    if (withCoords.length > 0) {
+      const bounds = new google.maps.LatLngBounds();
+      withCoords.forEach(l => bounds.extend({ lat: l.lat!, lng: l.lng! }));
+      map.fitBounds(bounds, 60);
+    }
+  }, [leads]);
 
   // Fly to selected lead
   useEffect(() => {
