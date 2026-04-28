@@ -14,12 +14,14 @@ interface HeatMapProps {
   leads: Lead[];
   selectedBairro: string;
   onSelectBairro: (b: string) => void;
+  selectedCity?: string;
+  onSelectCity?: (c: string) => void;
   selectedLeadId: string | null;
   onSelectLeadOnMap: (lead: Lead) => void;
 }
 
-export default function HeatMap({ leads, selectedBairro, onSelectBairro, selectedLeadId, onSelectLeadOnMap }: HeatMapProps) {
-  const [selectedCity, setSelectedCity] = useState<string>("all");
+export default function HeatMap({ leads, selectedBairro, onSelectBairro, selectedCity: selectedCityProp, onSelectCity, selectedLeadId, onSelectLeadOnMap }: HeatMapProps) {
+  const selectedCity = selectedCityProp && selectedCityProp !== "" ? selectedCityProp : "all";
   const [infoLead, setInfoLead] = useState<Lead | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
 
@@ -30,7 +32,13 @@ export default function HeatMap({ leads, selectedBairro, onSelectBairro, selecte
   const visibleLeads = useMemo(() => {
     let filtered = leads;
     if (selectedCity !== "all") filtered = filtered.filter(l => l.cidade === selectedCity);
-    if (selectedBairro) filtered = filtered.filter(l => l.bairro === selectedBairro);
+    if (selectedBairro) {
+      filtered = filtered.filter(l => {
+        const parts = (l.bairro || "").split(" - ");
+        const name = parts.length >= 2 ? parts[parts.length - 1].trim() : (l.bairro || "").trim();
+        return name === selectedBairro || l.bairro === selectedBairro;
+      });
+    }
     return filtered;
   }, [leads, selectedCity, selectedBairro]);
 
@@ -58,7 +66,7 @@ export default function HeatMap({ leads, selectedBairro, onSelectBairro, selecte
 
   const handleCityClick = useCallback((city: string) => {
     const next = selectedCity === city ? "all" : city;
-    setSelectedCity(next);
+    onSelectCity?.(next === "all" ? "" : next);
     onSelectBairro("");
     if (!mapRef.current) return;
     if (next === "all") {
@@ -72,7 +80,7 @@ export default function HeatMap({ leads, selectedBairro, onSelectBairro, selecte
         mapRef.current.fitBounds(bounds, 40);
       }
     }
-  }, [selectedCity, leads, onSelectBairro]);
+  }, [selectedCity, leads, onSelectBairro, onSelectCity]);
 
   const handleBairroClick = useCallback((bairro: string) => {
     const next = selectedBairro === bairro ? "" : bairro;

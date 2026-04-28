@@ -161,7 +161,7 @@ export default function CRM({ currentUser, onLogout }: CRMProps) {
         
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           <div className="lg:col-span-3 space-y-4">
-            <HeatMap leads={leads} selectedBairro={filters.bairro} onSelectBairro={handleBairroFilter} selectedLeadId={selectedLeadId} onSelectLeadOnMap={handleSelectLeadOnMap} />
+            <HeatMap leads={leads} selectedBairro={filters.bairro} onSelectBairro={handleBairroFilter} selectedCity={filters.cidade} onSelectCity={(c) => setFilters(f => ({ ...f, cidade: c, bairro: "" }))} selectedLeadId={selectedLeadId} onSelectLeadOnMap={handleSelectLeadOnMap} />
             <LeadsTable leads={filteredLeads} onSelectLead={handleSelectLead} onUpdateStatus={handleUpdateStatus} />
           </div>
           <div className="space-y-4">
