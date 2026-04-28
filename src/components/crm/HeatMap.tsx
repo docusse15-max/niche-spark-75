@@ -36,7 +36,14 @@ export default function HeatMap({ leads, selectedBairro, onSelectBairro, selecte
 
   const onLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
-  }, []);
+    // Auto-fit bounds to all leads with coordinates
+    const withCoords = leads.filter(l => l.lat && l.lng);
+    if (withCoords.length > 0) {
+      const bounds = new google.maps.LatLngBounds();
+      withCoords.forEach(l => bounds.extend({ lat: l.lat!, lng: l.lng! }));
+      map.fitBounds(bounds, 60);
+    }
+  }, [leads]);
 
   // Fly to selected lead
   useEffect(() => {
