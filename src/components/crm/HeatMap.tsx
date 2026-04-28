@@ -14,12 +14,14 @@ interface HeatMapProps {
   leads: Lead[];
   selectedBairro: string;
   onSelectBairro: (b: string) => void;
+  selectedCity?: string;
+  onSelectCity?: (c: string) => void;
   selectedLeadId: string | null;
   onSelectLeadOnMap: (lead: Lead) => void;
 }
 
-export default function HeatMap({ leads, selectedBairro, onSelectBairro, selectedLeadId, onSelectLeadOnMap }: HeatMapProps) {
-  const [selectedCity, setSelectedCity] = useState<string>("all");
+export default function HeatMap({ leads, selectedBairro, onSelectBairro, selectedCity: selectedCityProp, onSelectCity, selectedLeadId, onSelectLeadOnMap }: HeatMapProps) {
+  const selectedCity = selectedCityProp && selectedCityProp !== "" ? selectedCityProp : "all";
   const [infoLead, setInfoLead] = useState<Lead | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
 
