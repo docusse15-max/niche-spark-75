@@ -110,7 +110,7 @@ export const NICHOS: Nicho[] = [
   "Clínica de Estética", "Odontologia", "Pet Shop", "Academia",
   "Clínica de Saúde", "Nutrição", "Psicologia", "Automotivo",
   "Serviços B2B", "Salão de Beleza", "Fisioterapia", "Educação",
-  "Coworking", "Contabilidade", "Limpeza Empresarial",
+  "Coworking", "Contabilidade", "Limpeza Empresarial", "Arena Esportiva",
 ];
 
 // Legacy export - now dynamic from cities
