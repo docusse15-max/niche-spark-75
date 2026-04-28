@@ -241,16 +241,38 @@ function buildLeadsFromAI(): Lead[] {
 
 const MOCK_LEADS: Lead[] = buildLeadsFromAI();
 
+function mergeStoredLeads(storedLeads: Lead[], baseLeads: Lead[]): Lead[] {
+  const merged = new Map<string, Lead>();
+
+  for (const lead of baseLeads) {
+    merged.set(lead.id, lead);
+  }
+
+  for (const lead of storedLeads) {
+    const baseLead = merged.get(lead.id);
+    merged.set(lead.id, baseLead ? { ...baseLead, ...lead } : lead);
+  }
+
+  return Array.from(merged.values());
+}
+
 export function getInitialLeads(): Lead[] {
   const stored = localStorage.getItem("crm_leads_v9");
   if (stored) {
-    try { return JSON.parse(stored); } catch { /* fall through */ }
+    try {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) {
+        return mergeStoredLeads(parsed, MOCK_LEADS);
+      }
+    } catch {
+      /* fall through */
+    }
   }
   return MOCK_LEADS;
 }
 
 export function saveLeads(leads: Lead[]) {
-  localStorage.setItem("crm_leads_v9", JSON.stringify(leads));
+  localStorage.setItem("crm_leads_v9", JSON.stringify(mergeStoredLeads(leads, MOCK_LEADS)));
 }
 
 // ===== ACTIVITY LOG =====
