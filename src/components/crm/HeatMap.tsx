@@ -8,7 +8,7 @@ import { MapPin, Navigation, MessageSquare, Star } from "lucide-react";
 const GOOGLE_MAPS_KEY = "AIzaSyAPHdxmB8MWTBHHulY7YKjWpf7l5clpUps";
 
 const containerStyle = { width: "100%", height: "400px" };
-const defaultCenter = { lat: -21.5, lng: -55.5 };
+const defaultCenter = { lat: -17.5, lng: -52.0 };
 
 interface HeatMapProps {
   leads: Lead[];
