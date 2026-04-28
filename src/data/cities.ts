@@ -8,11 +8,15 @@ export type Cidade =
   | "Corumbá"
   | "Maracaju"
   | "Rio Brilhante"
-  | "Costa Rica";
+  | "Costa Rica"
+  | "Cuiabá"
+  | "Brasília"
+  | "Goiânia";
 
 export const CIDADES: Cidade[] = [
   "Campo Grande", "Dourados", "Ponta Porã", "Aquidauana",
   "Sidrolândia", "Bonito", "Corumbá", "Maracaju", "Rio Brilhante", "Costa Rica",
+  "Cuiabá", "Brasília", "Goiânia",
 ];
 
 export type Bairro = string;
@@ -118,6 +122,47 @@ export const CIDADE_CONFIGS: Record<Cidade, CidadeConfig> = {
       { nome: "Jardim Aeroporto", coords: [-18.5470, -53.1310] },
       { nome: "Vila São Pedro", coords: [-18.5400, -53.1300] },
       { nome: "Bairro Industrial", coords: [-18.5490, -53.1230] },
+    ],
+  },
+  "Cuiabá": {
+    center: [-15.6014, -56.0979],
+    bairros: [
+      { nome: "Centro", coords: [-15.6014, -56.0979] },
+      { nome: "Jardim Aclimação", coords: [-15.5870, -56.0900] },
+      { nome: "Goiabeiras", coords: [-15.5780, -56.0850] },
+      { nome: "Bosque da Saúde", coords: [-15.6100, -56.1000] },
+      { nome: "Jardim Cuiabá", coords: [-15.5950, -56.0750] },
+      { nome: "Coxipó", coords: [-15.6300, -56.0650] },
+      { nome: "Santa Rosa", coords: [-15.5900, -56.0650] },
+      { nome: "Ribeirão do Lipa", coords: [-15.5650, -56.0900] },
+    ],
+  },
+  "Brasília": {
+    center: [-15.7942, -47.8822],
+    bairros: [
+      { nome: "Asa Sul", coords: [-15.8200, -47.9100] },
+      { nome: "Asa Norte", coords: [-15.7600, -47.8700] },
+      { nome: "Lago Sul", coords: [-15.8400, -47.8700] },
+      { nome: "Lago Norte", coords: [-15.7400, -47.8400] },
+      { nome: "Sudoeste", coords: [-15.8000, -47.9300] },
+      { nome: "Águas Claras", coords: [-15.8350, -48.0250] },
+      { nome: "Taguatinga", coords: [-15.8330, -48.0570] },
+      { nome: "Park Sul", coords: [-15.8280, -47.9530] },
+      { nome: "Noroeste", coords: [-15.7530, -47.9100] },
+    ],
+  },
+  "Goiânia": {
+    center: [-16.6864, -49.2643],
+    bairros: [
+      { nome: "Setor Bueno", coords: [-16.7050, -49.2780] },
+      { nome: "Setor Marista", coords: [-16.7000, -49.2650] },
+      { nome: "Setor Oeste", coords: [-16.6800, -49.2750] },
+      { nome: "Jardim Goiás", coords: [-16.7100, -49.2400] },
+      { nome: "Setor Sul", coords: [-16.6950, -49.2550] },
+      { nome: "Alto da Glória", coords: [-16.7150, -49.2520] },
+      { nome: "Setor Bela Vista", coords: [-16.7200, -49.2680] },
+      { nome: "Centro", coords: [-16.6800, -49.2530] },
+      { nome: "Setor Aeroporto", coords: [-16.6950, -49.2280] },
     ],
   },
 };

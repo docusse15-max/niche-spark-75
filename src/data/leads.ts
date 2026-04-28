@@ -29,7 +29,8 @@ export type Nicho =
   | "Educação"
   | "Coworking"
   | "Contabilidade"
-  | "Limpeza Empresarial";
+  | "Limpeza Empresarial"
+  | "Arena Esportiva";
 
 export type Bairro = string;
 
@@ -109,7 +110,7 @@ export const NICHOS: Nicho[] = [
   "Clínica de Estética", "Odontologia", "Pet Shop", "Academia",
   "Clínica de Saúde", "Nutrição", "Psicologia", "Automotivo",
   "Serviços B2B", "Salão de Beleza", "Fisioterapia", "Educação",
-  "Coworking", "Contabilidade", "Limpeza Empresarial",
+  "Coworking", "Contabilidade", "Limpeza Empresarial", "Arena Esportiva",
 ];
 
 // Legacy export - now dynamic from cities
@@ -144,6 +145,7 @@ const DESCRICOES: Record<Nicho, string> = {
   "Coworking": "Espaço de trabalho compartilhado com planos mensais.",
   "Contabilidade": "Escritório contábil com gestão fiscal e tributária.",
   "Limpeza Empresarial": "Empresa de limpeza e conservação para espaços comerciais.",
+  "Arena Esportiva": "Arena esportiva com quadras de beach tennis, futevôlei e eventos.",
 };
 
 const MOTIVOS: Record<Nicho, string> = {
@@ -162,6 +164,7 @@ const MOTIVOS: Record<Nicho, string> = {
   "Coworking": "Planos mensais de uso do espaço e serviços adicionais.",
   "Contabilidade": "Honorários mensais fixos para gestão contábil e fiscal.",
   "Limpeza Empresarial": "Contratos mensais/quinzenais de limpeza e conservação.",
+  "Arena Esportiva": "Mensalidades de day-use, alunos de aulas e locação recorrente de quadras.",
 };
 
 function generatePhone(ddd: string): string {
@@ -182,6 +185,9 @@ const CIDADE_DDD: Record<Cidade, string> = {
   "Maracaju": "67",
   "Rio Brilhante": "67",
   "Costa Rica": "67",
+  "Cuiabá": "65",
+  "Brasília": "61",
+  "Goiânia": "62",
 };
 
 import aiLeadsRaw from "./ai-leads.json";
