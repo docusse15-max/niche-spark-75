@@ -211,6 +211,30 @@ export const BAIRROS_EQUITY: BairroEquity[] = [
   { nome: "Águas Claras", cidade: "Brasília", coords: [-15.84, -48.02], valorMedioM2: 7500, totalImoveis: 500, oportunidades: 70, ticketMedio: 620000, crescimento12m: 8.5, nivel: "alto" },
   { nome: "Taguatinga", cidade: "Brasília", coords: [-15.837, -48.05], valorMedioM2: 4800, totalImoveis: 400, oportunidades: 55, ticketMedio: 380000, crescimento12m: 6.0, nivel: "medio" },
   { nome: "Samambaia", cidade: "Brasília", coords: [-15.877, -48.08], valorMedioM2: 3500, totalImoveis: 450, oportunidades: 65, ticketMedio: 260000, crescimento12m: 4.5, nivel: "baixo" },
+
+  // ── SÃO PAULO ── (Zona Sul: Av. Paulista → Jabaquara)
+  { nome: "Bela Vista", cidade: "São Paulo", coords: [-23.5614, -46.6469], valorMedioM2: 13500, totalImoveis: 520, oportunidades: 70, ticketMedio: 1250000, crescimento12m: 8.5, nivel: "alto" },
+  { nome: "Jardim Paulista", cidade: "São Paulo", coords: [-23.5707, -46.6663], valorMedioM2: 16800, totalImoveis: 480, oportunidades: 60, ticketMedio: 1850000, crescimento12m: 9.2, nivel: "alto" },
+  { nome: "Cerqueira César", cidade: "São Paulo", coords: [-23.5613, -46.6700], valorMedioM2: 15500, totalImoveis: 360, oportunidades: 48, ticketMedio: 1650000, crescimento12m: 8.8, nivel: "alto" },
+  { nome: "Consolação", cidade: "São Paulo", coords: [-23.5547, -46.6610], valorMedioM2: 12800, totalImoveis: 410, oportunidades: 55, ticketMedio: 980000, crescimento12m: 7.5, nivel: "alto" },
+  { nome: "Itaim Bibi", cidade: "São Paulo", coords: [-23.5859, -46.6770], valorMedioM2: 17500, totalImoveis: 450, oportunidades: 58, ticketMedio: 1950000, crescimento12m: 10.1, nivel: "alto" },
+  { nome: "Vila Olímpia", cidade: "São Paulo", coords: [-23.5955, -46.6859], valorMedioM2: 16200, totalImoveis: 380, oportunidades: 50, ticketMedio: 1700000, crescimento12m: 9.8, nivel: "alto" },
+  { nome: "Moema", cidade: "São Paulo", coords: [-23.6018, -46.6650], valorMedioM2: 15000, totalImoveis: 520, oportunidades: 65, ticketMedio: 1450000, crescimento12m: 8.7, nivel: "alto" },
+  { nome: "Vila Mariana", cidade: "São Paulo", coords: [-23.5895, -46.6347], valorMedioM2: 12500, totalImoveis: 490, oportunidades: 62, ticketMedio: 1100000, crescimento12m: 7.9, nivel: "alto" },
+  { nome: "Paraíso", cidade: "São Paulo", coords: [-23.5751, -46.6448], valorMedioM2: 13800, totalImoveis: 320, oportunidades: 42, ticketMedio: 1180000, crescimento12m: 8.0, nivel: "alto" },
+  { nome: "Aclimação", cidade: "São Paulo", coords: [-23.5683, -46.6275], valorMedioM2: 11500, totalImoveis: 280, oportunidades: 38, ticketMedio: 920000, crescimento12m: 7.2, nivel: "medio" },
+  { nome: "Ipiranga", cidade: "São Paulo", coords: [-23.5879, -46.6101], valorMedioM2: 8500, totalImoveis: 410, oportunidades: 55, ticketMedio: 680000, crescimento12m: 6.5, nivel: "medio" },
+  { nome: "Saúde", cidade: "São Paulo", coords: [-23.6189, -46.6396], valorMedioM2: 11000, totalImoveis: 380, oportunidades: 50, ticketMedio: 880000, crescimento12m: 7.0, nivel: "medio" },
+  { nome: "Mirandópolis", cidade: "São Paulo", coords: [-23.6094, -46.6463], valorMedioM2: 11800, totalImoveis: 290, oportunidades: 38, ticketMedio: 950000, crescimento12m: 7.3, nivel: "alto" },
+  { nome: "Vila Clementino", cidade: "São Paulo", coords: [-23.5985, -46.6398], valorMedioM2: 12200, totalImoveis: 320, oportunidades: 42, ticketMedio: 1020000, crescimento12m: 7.6, nivel: "alto" },
+  { nome: "Campo Belo", cidade: "São Paulo", coords: [-23.6206, -46.6705], valorMedioM2: 13500, totalImoveis: 360, oportunidades: 45, ticketMedio: 1280000, crescimento12m: 8.2, nivel: "alto" },
+  { nome: "Brooklin", cidade: "São Paulo", coords: [-23.6128, -46.6853], valorMedioM2: 14200, totalImoveis: 400, oportunidades: 52, ticketMedio: 1380000, crescimento12m: 8.5, nivel: "alto" },
+  { nome: "Santo Amaro", cidade: "São Paulo", coords: [-23.6500, -46.7090], valorMedioM2: 9500, totalImoveis: 470, oportunidades: 60, ticketMedio: 760000, crescimento12m: 6.8, nivel: "medio" },
+  { nome: "Jabaquara", cidade: "São Paulo", coords: [-23.6469, -46.6428], valorMedioM2: 8200, totalImoveis: 520, oportunidades: 70, ticketMedio: 620000, crescimento12m: 6.2, nivel: "medio" },
+  { nome: "Vila Guarani", cidade: "São Paulo", coords: [-23.6358, -46.6395], valorMedioM2: 7800, totalImoveis: 380, oportunidades: 50, ticketMedio: 580000, crescimento12m: 5.8, nivel: "medio" },
+  { nome: "Planalto Paulista", cidade: "São Paulo", coords: [-23.6229, -46.6531], valorMedioM2: 12500, totalImoveis: 240, oportunidades: 32, ticketMedio: 1080000, crescimento12m: 7.5, nivel: "alto" },
+  { nome: "Chácara Klabin", cidade: "São Paulo", coords: [-23.5871, -46.6230], valorMedioM2: 11800, totalImoveis: 260, oportunidades: 35, ticketMedio: 1000000, crescimento12m: 7.4, nivel: "alto" },
+  { nome: "Cambuci", cidade: "São Paulo", coords: [-23.5689, -46.6191], valorMedioM2: 8800, totalImoveis: 310, oportunidades: 42, ticketMedio: 680000, crescimento12m: 6.0, nivel: "medio" },
 ];
 
 export const CIDADES_EQUITY = [...new Set(BAIRROS_EQUITY.map(b => b.cidade))];
