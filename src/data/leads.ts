@@ -124,9 +124,9 @@ export const BAIRROS: string[] = (() => {
   return [...new Set(all)];
 })();
 
-export const COMERCIAIS = ["Dorileu", "Felipe", "Gabi", "Janna"] as const;
+export const COMERCIAIS = ["Dorileu", "Felipe", "Gabi", "Janna", "Thyrson"] as const;
 export type Comercial = typeof COMERCIAIS[number];
-export const RESPONSAVEIS = ["Dorileu", "Felipe", "Gabi", "Janna"];
+export const RESPONSAVEIS = ["Dorileu", "Felipe", "Gabi", "Janna", "Thyrson"];
 
 
 const DESCRICOES: Record<Nicho, string> = {
@@ -188,6 +188,7 @@ const CIDADE_DDD: Record<Cidade, string> = {
   "Cuiabá": "65",
   "Brasília": "61",
   "Goiânia": "62",
+  "São Paulo": "11",
 };
 
 import aiLeadsRaw from "./ai-leads.json";
@@ -257,7 +258,7 @@ function mergeStoredLeads(storedLeads: Lead[], baseLeads: Lead[]): Lead[] {
 }
 
 export function getInitialLeads(): Lead[] {
-  const stored = localStorage.getItem("crm_leads_v9");
+  const stored = localStorage.getItem("crm_leads_v10");
   if (stored) {
     try {
       const parsed = JSON.parse(stored);
@@ -272,7 +273,7 @@ export function getInitialLeads(): Lead[] {
 }
 
 export function saveLeads(leads: Lead[]) {
-  localStorage.setItem("crm_leads_v9", JSON.stringify(mergeStoredLeads(leads, MOCK_LEADS)));
+  localStorage.setItem("crm_leads_v10", JSON.stringify(mergeStoredLeads(leads, MOCK_LEADS)));
 }
 
 // ===== ACTIVITY LOG =====

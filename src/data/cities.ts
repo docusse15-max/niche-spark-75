@@ -11,12 +11,13 @@ export type Cidade =
   | "Costa Rica"
   | "Cuiabá"
   | "Brasília"
-  | "Goiânia";
+  | "Goiânia"
+  | "São Paulo";
 
 export const CIDADES: Cidade[] = [
   "Campo Grande", "Dourados", "Ponta Porã", "Aquidauana",
   "Sidrolândia", "Bonito", "Corumbá", "Maracaju", "Rio Brilhante", "Costa Rica",
-  "Cuiabá", "Brasília", "Goiânia",
+  "Cuiabá", "Brasília", "Goiânia", "São Paulo",
 ];
 
 export type Bairro = string;
@@ -163,6 +164,33 @@ export const CIDADE_CONFIGS: Record<Cidade, CidadeConfig> = {
       { nome: "Setor Bela Vista", coords: [-16.7200, -49.2680] },
       { nome: "Centro", coords: [-16.6800, -49.2530] },
       { nome: "Setor Aeroporto", coords: [-16.6950, -49.2280] },
+    ],
+  },
+  "São Paulo": {
+    center: [-23.6100, -46.6500],
+    bairros: [
+      { nome: "Bela Vista", coords: [-23.5614, -46.6500] },
+      { nome: "Jardim Paulista", coords: [-23.5680, -46.6580] },
+      { nome: "Cerqueira César", coords: [-23.5620, -46.6680] },
+      { nome: "Paraíso", coords: [-23.5760, -46.6450] },
+      { nome: "Vila Mariana", coords: [-23.5870, -46.6340] },
+      { nome: "Aclimação", coords: [-23.5750, -46.6260] },
+      { nome: "Ipiranga", coords: [-23.5920, -46.6100] },
+      { nome: "Saúde", coords: [-23.6180, -46.6400] },
+      { nome: "Mirandópolis", coords: [-23.6080, -46.6500] },
+      { nome: "Bosque da Saúde", coords: [-23.6200, -46.6280] },
+      { nome: "Moema", coords: [-23.6010, -46.6650] },
+      { nome: "Indianópolis", coords: [-23.5930, -46.6620] },
+      { nome: "Campo Belo", coords: [-23.6230, -46.6720] },
+      { nome: "Brooklin", coords: [-23.6100, -46.6900] },
+      { nome: "Vila Olímpia", coords: [-23.5960, -46.6840] },
+      { nome: "Itaim Bibi", coords: [-23.5860, -46.6750] },
+      { nome: "Chácara Klabin", coords: [-23.5990, -46.6280] },
+      { nome: "Praça da Árvore", coords: [-23.6240, -46.6390] },
+      { nome: "Conceição", coords: [-23.6360, -46.6420] },
+      { nome: "Jabaquara", coords: [-23.6470, -46.6440] },
+      { nome: "Planalto Paulista", coords: [-23.6160, -46.6580] },
+      { nome: "Vila Clementino", coords: [-23.5980, -46.6440] },
     ],
   },
 };
