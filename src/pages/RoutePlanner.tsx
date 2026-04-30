@@ -13,7 +13,8 @@ import { ArrowLeft, MapPin, Navigation, Phone, Star, Route, Locate, ExternalLink
 import { toast } from "@/hooks/use-toast";
 
 const GOOGLE_MAPS_KEY = "AIzaSyAPHdxmB8MWTBHHulY7YKjWpf7l5clpUps";
-const DEFAULT_ADDRESS = "R. Pedro Celestino, 3607 - Centro, Campo Grande - MS, 79010-780";
+const DEFAULT_ADDRESS_CG = "R. Pedro Celestino, 3607 - Centro, Campo Grande - MS, 79010-780";
+const DEFAULT_ADDRESS_SP = "Av. Paulista, 1000 - Bela Vista, São Paulo - SP, 01310-100";
 const containerStyle = { width: "100%", height: "100%" };
 
 function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -29,9 +30,15 @@ const potScore: Record<string, number> = { premium: 4, alto: 3, medio: 2, baixo:
 
 export default function RoutePlanner() {
   const navigate = useNavigate();
-  const leads = useMemo(() => getInitialLeads(), []);
+  const currentUser = typeof window !== "undefined" ? sessionStorage.getItem("crm_user") : null;
+  const isThyrson = currentUser === "Thyrson";
+  const allLeads = useMemo(() => getInitialLeads(), []);
+  const leads = useMemo(
+    () => isThyrson ? allLeads.filter(l => l.cidade === "São Paulo") : allLeads,
+    [allLeads, isThyrson]
+  );
 
-  const [address, setAddress] = useState(DEFAULT_ADDRESS);
+  const [address, setAddress] = useState(isThyrson ? DEFAULT_ADDRESS_SP : DEFAULT_ADDRESS_CG);
   const [origin, setOrigin] = useState<{ lat: number; lng: number } | null>(null);
   const [radius, setRadius] = useState(5);
   const [maxLeads, setMaxLeads] = useState(10);
@@ -43,7 +50,7 @@ export default function RoutePlanner() {
   const mapRef = useRef<google.maps.Map | null>(null);
 
   // Filters
-  const [filterCidade, setFilterCidade] = useState<string>("todas");
+  const [filterCidade, setFilterCidade] = useState<string>(isThyrson ? "São Paulo" : "todas");
   const [filterNicho, setFilterNicho] = useState<string>("todos");
   const [filterTemp, setFilterTemp] = useState<string>("todas");
   const [filterStatus, setFilterStatus] = useState<string>("todos");
@@ -253,7 +260,7 @@ export default function RoutePlanner() {
                       if (val !== "todas" && CIDADE_CONFIGS[val as Cidade]) {
                         const [lat, lng] = CIDADE_CONFIGS[val as Cidade].center;
                         setOrigin({ lat, lng });
-                        setAddress(`Centro, ${val} - MS`);
+                        setAddress(`Centro, ${val}`);
                         setDirections(null);
                         setSelectedRoute([]);
                         toast({ title: `Mapa centralizado em ${val}` });
