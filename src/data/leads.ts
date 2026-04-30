@@ -188,6 +188,7 @@ const CIDADE_DDD: Record<Cidade, string> = {
   "Cuiabá": "65",
   "Brasília": "61",
   "Goiânia": "62",
+  "São Paulo": "11",
 };
 
 import aiLeadsRaw from "./ai-leads.json";
