@@ -7,7 +7,7 @@ import logoVfmoney from "@/assets/logo-vfmoney.png";
 import { trackEvent, initLocationTracking } from "@/lib/activity-tracker";
 import { toast } from "sonner";
 
-const COMERCIAIS = ["Valdomiro", "Dorileu", "Felipe", "Gabi", "Janna"];
+const COMERCIAIS = ["Valdomiro", "Dorileu", "Felipe", "Gabi", "Janna", "Thyrson"];
 const PASSWORD_PROTECTED_USERS = ["Valdomiro"];
 const USER_PASSWORD = "56239050";
 const LOCATION_EXCLUDED_USERS = ["Valdomiro"];

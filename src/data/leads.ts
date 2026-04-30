@@ -124,9 +124,9 @@ export const BAIRROS: string[] = (() => {
   return [...new Set(all)];
 })();
 
-export const COMERCIAIS = ["Dorileu", "Felipe", "Gabi", "Janna"] as const;
+export const COMERCIAIS = ["Dorileu", "Felipe", "Gabi", "Janna", "Thyrson"] as const;
 export type Comercial = typeof COMERCIAIS[number];
-export const RESPONSAVEIS = ["Dorileu", "Felipe", "Gabi", "Janna"];
+export const RESPONSAVEIS = ["Dorileu", "Felipe", "Gabi", "Janna", "Thyrson"];
 
 
 const DESCRICOES: Record<Nicho, string> = {
