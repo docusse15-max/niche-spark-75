@@ -258,7 +258,7 @@ function mergeStoredLeads(storedLeads: Lead[], baseLeads: Lead[]): Lead[] {
 }
 
 export function getInitialLeads(): Lead[] {
-  const stored = localStorage.getItem("crm_leads_v9");
+  const stored = localStorage.getItem("crm_leads_v10");
   if (stored) {
     try {
       const parsed = JSON.parse(stored);
@@ -273,7 +273,7 @@ export function getInitialLeads(): Lead[] {
 }
 
 export function saveLeads(leads: Lead[]) {
-  localStorage.setItem("crm_leads_v9", JSON.stringify(mergeStoredLeads(leads, MOCK_LEADS)));
+  localStorage.setItem("crm_leads_v10", JSON.stringify(mergeStoredLeads(leads, MOCK_LEADS)));
 }
 
 // ===== ACTIVITY LOG =====
