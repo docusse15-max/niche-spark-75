@@ -13,7 +13,8 @@ import { ArrowLeft, MapPin, Navigation, Phone, Star, Route, Locate, ExternalLink
 import { toast } from "@/hooks/use-toast";
 
 const GOOGLE_MAPS_KEY = "AIzaSyAPHdxmB8MWTBHHulY7YKjWpf7l5clpUps";
-const DEFAULT_ADDRESS = "R. Pedro Celestino, 3607 - Centro, Campo Grande - MS, 79010-780";
+const DEFAULT_ADDRESS_CG = "R. Pedro Celestino, 3607 - Centro, Campo Grande - MS, 79010-780";
+const DEFAULT_ADDRESS_SP = "Av. Paulista, 1000 - Bela Vista, São Paulo - SP, 01310-100";
 const containerStyle = { width: "100%", height: "100%" };
 
 function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
