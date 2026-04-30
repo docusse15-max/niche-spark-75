@@ -25,7 +25,12 @@ interface CRMProps {
 }
 
 export default function CRM({ currentUser, onLogout }: CRMProps) {
-  const [leads, setLeads] = useState<Lead[]>(getInitialLeads);
+  const [allLeads, setAllLeads] = useState<Lead[]>(getInitialLeads);
+  const leads = useMemo(
+    () => currentUser === "Thyrson" ? allLeads.filter(l => l.cidade === "São Paulo") : allLeads,
+    [allLeads, currentUser]
+  );
+  const setLeads = setAllLeads;
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
