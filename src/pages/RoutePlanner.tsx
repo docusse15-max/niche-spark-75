@@ -260,7 +260,7 @@ export default function RoutePlanner() {
                       if (val !== "todas" && CIDADE_CONFIGS[val as Cidade]) {
                         const [lat, lng] = CIDADE_CONFIGS[val as Cidade].center;
                         setOrigin({ lat, lng });
-                        setAddress(`Centro, ${val} - MS`);
+                        setAddress(`Centro, ${val}`);
                         setDirections(null);
                         setSelectedRoute([]);
                         toast({ title: `Mapa centralizado em ${val}` });
