@@ -50,7 +50,7 @@ export default function RoutePlanner() {
   const mapRef = useRef<google.maps.Map | null>(null);
 
   // Filters
-  const [filterCidade, setFilterCidade] = useState<string>("todas");
+  const [filterCidade, setFilterCidade] = useState<string>(isThyrson ? "São Paulo" : "todas");
   const [filterNicho, setFilterNicho] = useState<string>("todos");
   const [filterTemp, setFilterTemp] = useState<string>("todas");
   const [filterStatus, setFilterStatus] = useState<string>("todos");
