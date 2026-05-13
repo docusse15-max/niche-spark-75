@@ -198,7 +198,7 @@ export default function HomeEquity() {
 
       {/* City filter */}
       <div className="flex flex-wrap gap-1.5">
-        {(isThyrson ? ["São Paulo"] : CIDADES_EQUITY).map(c => (
+        {(isSaoPauloUser ? ["São Paulo"] : CIDADES_EQUITY).map(c => (
           <button
             key={c}
             onClick={() => handleCityClick(c)}
