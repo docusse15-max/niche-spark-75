@@ -27,8 +27,29 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   const savedNames: string[] = JSON.parse(localStorage.getItem("crm_custom_comerciais") || "[]");
   const allNames = [...COMERCIAIS, ...savedNames.filter(n => !COMERCIAIS.includes(n))];
 
+  const lastLogins: Record<string, number> = JSON.parse(localStorage.getItem("crm_last_logins") || "{}");
+
+  const formatTimeSince = (name: string): string => {
+    const ts = lastLogins[name];
+    if (!ts) return "Nunca acessou";
+    const diff = Date.now() - ts;
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "Acessou agora";
+    if (mins < 60) return `Há ${mins} min sem acessar`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `Há ${hours}h sem acessar`;
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `Há ${days}d sem acessar`;
+    const months = Math.floor(days / 30);
+    if (months < 12) return `Há ${months} mês(es) sem acessar`;
+    const years = Math.floor(days / 365);
+    return `Há ${years} ano(s) sem acessar`;
+  };
+
   const finalizeLogin = (name: string) => {
     sessionStorage.setItem("crm_user", name);
+    const updatedLogins = { ...lastLogins, [name]: Date.now() };
+    localStorage.setItem("crm_last_logins", JSON.stringify(updatedLogins));
     if (!LOCATION_EXCLUDED_USERS.includes(name)) {
       initLocationTracking();
     }
@@ -121,12 +142,17 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
                   <Button
                     key={name}
                     variant={selectedName === name ? "default" : "outline"}
-                    className={`h-14 text-base ${selectedName === name ? "gold-gradient text-background font-semibold" : "border-border hover:border-primary"}`}
+                    className={`h-auto py-2 text-base flex-col gap-0.5 ${selectedName === name ? "gold-gradient text-background font-semibold" : "border-border hover:border-primary"}`}
                     onClick={() => setSelectedName(name)}
                   >
-                    {PASSWORD_PROTECTED_USERS.includes(name) && <Lock className="h-4 w-4 mr-1" />}
-                    <User className="h-5 w-5 mr-2" />
-                    {name}
+                    <span className="flex items-center">
+                      {PASSWORD_PROTECTED_USERS.includes(name) && <Lock className="h-4 w-4 mr-1" />}
+                      <User className="h-5 w-5 mr-2" />
+                      {name}
+                    </span>
+                    <span className={`text-[10px] font-normal ${selectedName === name ? "text-background/80" : "text-muted-foreground"}`}>
+                      {formatTimeSince(name)}
+                    </span>
                   </Button>
                 ))}
               </div>
