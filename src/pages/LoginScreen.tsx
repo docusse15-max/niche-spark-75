@@ -32,18 +32,12 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   const formatTimeSince = (name: string): string => {
     const ts = lastLogins[name];
     if (!ts) return "Nunca acessou";
-    const diff = Date.now() - ts;
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return "Acessou agora";
-    if (mins < 60) return `Há ${mins} min sem acessar`;
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return `Há ${hours}h sem acessar`;
-    const days = Math.floor(hours / 24);
-    if (days < 30) return `Há ${days}d sem acessar`;
-    const months = Math.floor(days / 30);
-    if (months < 12) return `Há ${months} mês(es) sem acessar`;
-    const years = Math.floor(days / 365);
-    return `Há ${years} ano(s) sem acessar`;
+    const lastDay = new Date(ts); lastDay.setHours(0, 0, 0, 0);
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const days = Math.floor((today.getTime() - lastDay.getTime()) / 86400000);
+    if (days <= 0) return "Acessou hoje";
+    if (days === 1) return "1 dia sem acessar";
+    return `${days} dias sem acessar`;
   };
 
   const finalizeLogin = (name: string) => {
