@@ -51,8 +51,9 @@ const fonteBadgeColors: Record<string, string> = {
 
 export default function HomeEquity() {
   const currentUser = typeof window !== "undefined" ? sessionStorage.getItem("crm_user") : null;
-  const isThyrson = currentUser === "Thyrson";
-  const [selectedCity, setSelectedCity] = useState<string>(isThyrson ? "São Paulo" : "Campo Grande");
+  const SAO_PAULO_USERS = ["Thyrson", "Paulo"];
+  const isSaoPauloUser = currentUser ? SAO_PAULO_USERS.includes(currentUser) : false;
+  const [selectedCity, setSelectedCity] = useState<string>(isSaoPauloUser ? "São Paulo" : "Campo Grande");
   const [infoBairro, setInfoBairro] = useState<BairroEquity | null>(null);
   const [sortBy, setSortBy] = useState<"valor" | "oportunidades" | "crescimento">("valor");
   const [listings, setListings] = useState<Listing[]>([]);
