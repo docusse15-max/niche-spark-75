@@ -31,14 +31,15 @@ const potScore: Record<string, number> = { premium: 4, alto: 3, medio: 2, baixo:
 export default function RoutePlanner() {
   const navigate = useNavigate();
   const currentUser = typeof window !== "undefined" ? sessionStorage.getItem("crm_user") : null;
-  const isThyrson = currentUser === "Thyrson";
+  const SAO_PAULO_USERS = ["Thyrson", "Paulo"];
+  const isSaoPauloUser = currentUser ? SAO_PAULO_USERS.includes(currentUser) : false;
   const allLeads = useMemo(() => getInitialLeads(), []);
   const leads = useMemo(
-    () => isThyrson ? allLeads.filter(l => l.cidade === "São Paulo") : allLeads,
-    [allLeads, isThyrson]
+    () => isSaoPauloUser ? allLeads.filter(l => l.cidade === "São Paulo") : allLeads,
+    [allLeads, isSaoPauloUser]
   );
 
-  const [address, setAddress] = useState(isThyrson ? DEFAULT_ADDRESS_SP : DEFAULT_ADDRESS_CG);
+  const [address, setAddress] = useState(isSaoPauloUser ? DEFAULT_ADDRESS_SP : DEFAULT_ADDRESS_CG);
   const [origin, setOrigin] = useState<{ lat: number; lng: number } | null>(null);
   const [radius, setRadius] = useState(5);
   const [maxLeads, setMaxLeads] = useState(10);
