@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, UserPlus, LogIn, Lock, ShieldAlert } from "lucide-react";
 import logoVfmoney from "@/assets/logo-vfmoney.png";
 import { trackEvent, initLocationTracking } from "@/lib/activity-tracker";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const COMERCIAIS = ["Valdomiro", "Dorileu", "Felipe", "Gabi", "Janna", "Thyrson", "Paulo"];
@@ -23,11 +24,32 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   const [showPasswordInput, setShowPasswordInput] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState(false);
+  const [lastLogins, setLastLogins] = useState<Record<string, number>>(
+    () => JSON.parse(localStorage.getItem("crm_last_logins") || "{}")
+  );
 
   const savedNames: string[] = JSON.parse(localStorage.getItem("crm_custom_comerciais") || "[]");
   const allNames = [...COMERCIAIS, ...savedNames.filter(n => !COMERCIAIS.includes(n))];
 
-  const lastLogins: Record<string, number> = JSON.parse(localStorage.getItem("crm_last_logins") || "{}");
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("activity_logs")
+        .select("author, created_at")
+        .eq("action", "login")
+        .order("created_at", { ascending: false })
+        .limit(1000);
+      if (!data) return;
+      const map: Record<string, number> = {};
+      for (const row of data as any[]) {
+        const ts = new Date(row.created_at).getTime();
+        if (!map[row.author] || ts > map[row.author]) map[row.author] = ts;
+      }
+      const merged = { ...JSON.parse(localStorage.getItem("crm_last_logins") || "{}"), ...map };
+      localStorage.setItem("crm_last_logins", JSON.stringify(merged));
+      setLastLogins(merged);
+    })();
+  }, []);
 
   const formatTimeSince = (name: string): string => {
     const ts = lastLogins[name];
